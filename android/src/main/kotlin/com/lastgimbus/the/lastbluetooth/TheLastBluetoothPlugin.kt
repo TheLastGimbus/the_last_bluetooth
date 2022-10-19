@@ -1,4 +1,4 @@
-package com.lastgimbus.the.lastbluetooth.the_last_bluetooth
+package com.lastgimbus.the.lastbluetooth
 
 import androidx.annotation.NonNull
 

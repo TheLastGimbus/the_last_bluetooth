@@ -1,4 +1,4 @@
-package com.lastgimbus.the.lastbluetooth.the_last_bluetooth_example
+package com.lastgimbus.the.lastbluetooth_example
 
 import io.flutter.embedding.android.FlutterActivity
 

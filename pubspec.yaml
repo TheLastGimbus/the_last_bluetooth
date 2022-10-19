@@ -35,7 +35,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.lastgimbus.the.lastbluetooth.the_last_bluetooth
+        package: com.lastgimbus.the.lastbluetooth
         pluginClass: TheLastBluetoothPlugin
 
   # To add assets to your plugin package, add an assets section, like this:

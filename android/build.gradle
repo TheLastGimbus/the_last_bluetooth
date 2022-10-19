@@ -1,4 +1,4 @@
-group 'com.lastgimbus.the.lastbluetooth.the_last_bluetooth'
+group 'com.lastgimbus.the.lastbluetooth'
 version '1.0-SNAPSHOT'
 
 buildscript {
