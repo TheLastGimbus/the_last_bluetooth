@@ -36,8 +36,28 @@ class _MyAppState extends State<MyApp> {
               FutureBuilder<bool>(
                 future: bt.isEnabled(),
                 initialData: false,
-                builder: (context, snapshot) =>
-                    Text("is enabled: ${snapshot.hasError ? 'error' : snapshot.data}"),
+                builder: (context, snapshot) => Text(
+                    "is enabled: ${snapshot.hasError ? 'error' : snapshot.data}"),
+              ),
+              FutureBuilder<String>(
+                future: bt.adapterName,
+                initialData: "wait...",
+                builder: (context, snapshot) => Text(
+                    "adapter name: ${snapshot.hasError ? 'error' : snapshot.data}"),
+              ),
+              const Text("paired devs:"),
+              FutureBuilder<List<BluetoothDevice>>(
+                future: bt.pairedDevices,
+                initialData: [],
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text("error: ${snapshot.error}");
+                  }
+                  if (snapshot.hasData != true) return const Text("wait...");
+                  return Column(
+                    children: snapshot.data!.map((e) => Text(e.name)).toList(),
+                  );
+                },
               ),
             ],
           ),

@@ -1,5 +1,6 @@
 package com.lastgimbus.the.lastbluetooth
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -33,6 +34,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
+    @SuppressLint("MissingPermission")
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if (bluetoothAdapter == null) {
             if (call.method == "isAvailable") result.success(false)
@@ -42,6 +44,12 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         when (call.method) {
             "isAvailable" -> result.success(true)
             "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
+            "getName" -> result.success(bluetoothAdapter!!.name)
+            "getPairedDevices" -> result.success(
+                bluetoothAdapter!!.bondedDevices
+                    .map { hashMapOf<String, Any>("name" to it.name) }
+                    .toList()
+            )
             else -> result.notImplemented()
         }
     }
