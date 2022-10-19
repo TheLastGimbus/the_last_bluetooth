@@ -31,9 +31,13 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        if (bluetoothAdapter == null) {
+            return if (call.method == "isAvailable") result.success(false)
+            else result.error("bluetooth_unavailable", "bluetooth is not available")
+        }
         when (call.method) {
+            "isAvailable" -> result.success(true)
             "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
-            "isAvailable" -> result.success(bluetoothAdapter != null)
             else -> result.notImplemented()
         }
     }
