@@ -5,4 +5,8 @@ class TheLastBluetooth {
   Future<String?> getPlatformVersion() {
     return TheLastBluetoothPlatform.instance.getPlatformVersion();
   }
+
+  Future<bool?> isAvailable() {
+    return TheLastBluetoothPlatform.instance.isAvailable();
+  }
 }

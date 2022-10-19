@@ -1,5 +1,8 @@
 package com.lastgimbus.the.lastbluetooth
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context
 import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -19,11 +22,18 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "the_last_bluetooth")
         channel.setMethodCallHandler(this)
+
+        val context: Context = flutterPluginBinding.applicationContext
+        val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
+        bluetoothAdapter = bm?.adapter
     }
+
+    private var bluetoothAdapter: BluetoothAdapter? = null
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
+            "isAvailable" -> result.success(bluetoothAdapter != null)
             else -> result.notImplemented()
         }
     }

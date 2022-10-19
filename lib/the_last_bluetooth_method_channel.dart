@@ -14,4 +14,10 @@ class MethodChannelTheLastBluetooth extends TheLastBluetoothPlatform {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
+  @override
+  Future<bool?> isAvailable() async {
+    final isAvailable = await methodChannel.invokeMethod<bool>('isAvailable');
+    return isAvailable;
+  }
 }
