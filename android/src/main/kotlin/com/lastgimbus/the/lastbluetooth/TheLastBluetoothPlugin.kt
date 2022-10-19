@@ -19,8 +19,11 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
 
+    private val PLUGIN_NAMESPACE = "the_last_bluetooth"
+
+
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "the_last_bluetooth")
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
         channel.setMethodCallHandler(this)
 
         val context: Context = flutterPluginBinding.applicationContext
@@ -32,12 +35,13 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if (bluetoothAdapter == null) {
-            return if (call.method == "isAvailable") result.success(false)
-            else result.error("bluetooth_unavailable", "bluetooth is not available")
+            if (call.method == "isAvailable") result.success(false)
+            else result.error("bluetooth_unavailable", "bluetooth is not available", null)
+            return
         }
         when (call.method) {
             "isAvailable" -> result.success(true)
-            "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
+            "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
             else -> result.notImplemented()
         }
     }
