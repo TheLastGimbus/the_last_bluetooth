@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';
 
 void main() {
@@ -55,7 +52,14 @@ class _MyAppState extends State<MyApp> {
                   }
                   if (snapshot.hasData != true) return const Text("wait...");
                   return Column(
-                    children: snapshot.data!.map((e) => Text(e.name)).toList(),
+                    children: snapshot.data!
+                        .map((e) => Text(
+                              "${e.name} ; "
+                              "${e.alias ?? "null"} ; "
+                              "${e.address} ; "
+                              "${e.isConnected ? "✅" : "❌"}",
+                            ))
+                        .toList(),
                   );
                 },
               ),

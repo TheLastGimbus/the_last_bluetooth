@@ -2,10 +2,11 @@ package com.lastgimbus.the.lastbluetooth
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.os.Build
 import androidx.annotation.NonNull
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -46,10 +47,14 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
             "getName" -> result.success(bluetoothAdapter!!.name)
             "getPairedDevices" -> result.success(
-                bluetoothAdapter!!.bondedDevices
-                    .map { hashMapOf<String, Any>("name" to it.name) }
-                    .toList()
+                bluetoothAdapter!!.bondedDevices.map {
+                    val alias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else null
+                    hashMapOf<String, Any?>(
+                        "name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected
+                    )
+                }.toList()
             )
+
             else -> result.notImplemented()
         }
     }
@@ -58,3 +63,9 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         channel.setMethodCallHandler(null)
     }
 }
+
+// XDDDDD
+// TODO: Move this to some btutils or smth
+private val BluetoothDevice.isConnected: Boolean
+    get() = this.javaClass.getMethod("isConnected").invoke(this) as Boolean
+
