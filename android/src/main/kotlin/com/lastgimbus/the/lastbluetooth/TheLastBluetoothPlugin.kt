@@ -35,10 +35,16 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
     private lateinit var eventChannel: EventChannel
-    private lateinit var eventSink: EventChannel.EventSink    // TODO: Rename it if we will need more than 1 of these
+    private var eventSink: EventChannel.EventSink? = null    // TODO: Rename it if we will need more than 1 of these
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
+
+    @SuppressLint("MissingPermission")
+    private fun getPairedDevices(): List<HashMap<String, Any?>> = bluetoothAdapter!!.bondedDevices.map {
+        val alias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else null
+        hashMapOf("name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected)
+    }
 
     // ##### FlutterPlugin stuff #####
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -78,15 +84,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
             "isAvailable" -> result.success(true)
             "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
             "getName" -> result.success(bluetoothAdapter!!.name)
-            "getPairedDevices" -> result.success(
-                bluetoothAdapter!!.bondedDevices.map {
-                    val alias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else null
-                    hashMapOf<String, Any?>(
-                        "name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected
-                    )
-                }.toList()
-            )
-
+            "getPairedDevices" -> result.success(getPairedDevices())
             else -> result.notImplemented()
         }
     }
@@ -98,24 +96,10 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             BluetoothDevice.ACTION_ACL_CONNECTED, BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                Log.i(TAG, "Device changed: ${intent.extras?.itemsToString()}")
-                val it = intent.extras?.get(BluetoothDevice.EXTRA_DEVICE) as BluetoothDevice?
-                if (it == null) {
-                    Log.wtf(TAG, "There is no bt device extra in ACL_DIS/CONNECTED intent D:")
-                } else {
-                    val alias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else null
-                    eventSink.success(
-                        // <HashMap<String, Any?>> -ing this has no effect - Flutter fucks up the types anyway
-                        listOf(
-                            hashMapOf(
-                                "name" to it.name,
-                                "alias" to alias,
-                                "address" to it.address,
-                                "isConnected" to it.isConnected
-                            )
-                        )
-                    )
-                }
+                Log.v(TAG, "Device changed: ${intent.extras?.itemsToString()}")
+                // I actually don't care about this, since we're just sending the new list anyway
+                // val dev = intent.extras?.get(BluetoothDevice.EXTRA_DEVICE) as BluetoothDevice?
+                eventSink?.success(getPairedDevices())
             }
 
             else -> Log.wtf(TAG, "This receiver should not get this intent: $intent")
@@ -125,9 +109,13 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
     // ##### EventSink stuff #####
     override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
         eventSink = events
+        eventSink!!.success(getPairedDevices())
     }
 
-    override fun onCancel(arguments: Any?) = eventSink.endOfStream()
+    override fun onCancel(arguments: Any?) {
+        eventSink?.endOfStream()
+        eventSink = null
+    }
 }
 
 // ##### Shitty extension functions section #####

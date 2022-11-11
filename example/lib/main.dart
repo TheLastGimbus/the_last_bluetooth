@@ -42,28 +42,7 @@ class _MyAppState extends State<MyApp> {
                 builder: (context, snapshot) => Text(
                     "adapter name: ${snapshot.hasError ? 'error' : snapshot.data}"),
               ),
-              const Text("paired devs:"),
-              FutureBuilder<List<BluetoothDevice>>(
-                future: bt.pairedDevices,
-                initialData: [],
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text("error: ${snapshot.error}");
-                  }
-                  if (snapshot.hasData != true) return const Text("wait...");
-                  return Column(
-                    children: snapshot.data!
-                        .map((e) => Text(
-                              "${e.name} ; "
-                              "${e.alias ?? "null"} ; "
-                              "${e.address} ; "
-                              "${e.isConnected ? "✅" : "❌"}",
-                            ))
-                        .toList(),
-                  );
-                },
-              ),
-              const Text("NEW: paired devs STREAM:"),
+              const Text("paired devs (NEW 💯 - STREAM):"),
               StreamBuilder<List<BluetoothDevice>>(
                 stream: bt.pairedDevicesStream,
                 initialData: [],
