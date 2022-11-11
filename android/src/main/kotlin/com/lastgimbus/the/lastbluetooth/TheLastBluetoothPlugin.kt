@@ -103,5 +103,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
 private val BluetoothDevice.isConnected: Boolean
     get() = this.javaClass.getMethod("isConnected").invoke(this) as Boolean
 
-private fun Bundle.itemsToString(): String = this.keySet().map { "$it: ${this.get(it).toString()}" }.joinToString(", ")
+private fun Bundle.itemsToString(): String =
+    this.keySet().joinToString(", ") { "$it: <${this.get(it)?.javaClass?.name}>${this.get(it)}" }
+
 
