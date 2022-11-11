@@ -27,19 +27,72 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
         const val TAG = "TheLastBluetoothPlugin"
     }
 
+    private val PLUGIN_NAMESPACE = "the_last_bluetooth"
+
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
     private lateinit var eventChannel: EventChannel
+    private lateinit var eventSink: EventChannel.EventSink    // TODO: Rename it if we will need more than 1 of these
 
-    // TODO: Rename it if we will need more than 1 of these
-    private lateinit var eventSink: EventChannel.EventSink
-
-    private val PLUGIN_NAMESPACE = "the_last_bluetooth"
+    private var bluetoothAdapter: BluetoothAdapter? = null
 
 
+    // ##### FlutterPlugin stuff #####
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
+        channel.setMethodCallHandler(this)
+        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream")
+        eventChannel.setStreamHandler(this);
+
+        val context: Context = flutterPluginBinding.applicationContext
+        val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
+        bluetoothAdapter = bm?.adapter
+        if (bluetoothAdapter == null) return;
+
+        val filter = IntentFilter().apply {
+            addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
+            addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+        }
+        ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_EXPORTED)
+        Log.d(TAG, "LISTENING.......")
+    }
+
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMethodCallHandler(null)
+    }
+
+
+    // ##### MethodCallHandler stuff #####
+    @SuppressLint("MissingPermission")
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        Log.d(TAG, "Method call: $call")
+        if (bluetoothAdapter == null) {
+            if (call.method == "isAvailable") result.success(false)
+            else result.error("bluetooth_unavailable", "bluetooth is not available", null)
+            return
+        }
+        when (call.method) {
+            "isAvailable" -> result.success(true)
+            "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
+            "getName" -> result.success(bluetoothAdapter!!.name)
+            "getPairedDevices" -> result.success(
+                bluetoothAdapter!!.bondedDevices.map {
+                    val alias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else null
+                    hashMapOf<String, Any?>(
+                        "name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected
+                    )
+                }.toList()
+            )
+
+            else -> result.notImplemented()
+        }
+    }
+
+
+    // ##### BroadcastReceiver stuff #####
     // BroadcastReceiver (for BluetoothDevice.ACTION_ACL_CONNECTED and BluetoothDevice.ACTION_ACL_DISCONNECTED)
     @SuppressLint("MissingPermission")  // Let user decide which permission they want
     override fun onReceive(context: Context, intent: Intent) {
@@ -69,63 +122,15 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
         }
     }
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
-        channel.setMethodCallHandler(this)
-        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream")
-        eventChannel.setStreamHandler(this);
-
-        val context: Context = flutterPluginBinding.applicationContext
-        val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
-        bluetoothAdapter = bm?.adapter
-        if (bluetoothAdapter == null) return;
-
-        val filter = IntentFilter().apply {
-            addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-            addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-        }
-        ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_EXPORTED)
-        Log.d(TAG, "LISTENING.......")
-    }
-
-    private var bluetoothAdapter: BluetoothAdapter? = null
-
-    @SuppressLint("MissingPermission")
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        Log.d(TAG, "Method call: $call")
-        if (bluetoothAdapter == null) {
-            if (call.method == "isAvailable") result.success(false)
-            else result.error("bluetooth_unavailable", "bluetooth is not available", null)
-            return
-        }
-        when (call.method) {
-            "isAvailable" -> result.success(true)
-            "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
-            "getName" -> result.success(bluetoothAdapter!!.name)
-            "getPairedDevices" -> result.success(
-                bluetoothAdapter!!.bondedDevices.map {
-                    val alias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else null
-                    hashMapOf<String, Any?>(
-                        "name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected
-                    )
-                }.toList()
-            )
-
-            else -> result.notImplemented()
-        }
-    }
-
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        channel.setMethodCallHandler(null)
-    }
-
-    // EventSink stuff
+    // ##### EventSink stuff #####
     override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
         eventSink = events
     }
 
     override fun onCancel(arguments: Any?) = eventSink.endOfStream()
 }
+
+// ##### Shitty extension functions section #####
 
 // XDDDDD
 // TODO: Move this to some btutils or smth
