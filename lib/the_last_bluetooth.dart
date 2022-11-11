@@ -13,6 +13,11 @@ class TheLastBluetooth {
   static const MethodChannel _methodChannel =
       MethodChannel('$namespace/methods');
 
+  static const EventChannel _devicesEventChannel =
+      EventChannel('devicesStream');
+
+  Stream<dynamic>? _devicesStream;
+
   TheLastBluetooth._() {
     _methodChannel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
@@ -35,5 +40,16 @@ class TheLastBluetooth {
     final devs =
         await _methodChannel.invokeMethod<List>('getPairedDevices') ?? [];
     return devs.map((e) => BluetoothDevice.fromMap(e)).toList();
+  }
+
+  Stream<List<BluetoothDevice>> get pairedDevicesStream {
+    // If you don't copy this, will not work on multiple widgets
+    _devicesStream ??= _devicesEventChannel.receiveBroadcastStream();
+    return _devicesStream!.map((event) {
+      if (event is! List<Object?>) {
+        throw 'WTF: $event is not List<Object?> - ${event.runtimeType} instead :/';
+      }
+      return event.map((d) => BluetoothDevice.fromMap(d as Map)).toList();
+    });
   }
 }

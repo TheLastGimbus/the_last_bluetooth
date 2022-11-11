@@ -63,6 +63,27 @@ class _MyAppState extends State<MyApp> {
                   );
                 },
               ),
+              const Text("NEW: paired devs STREAM:"),
+              StreamBuilder<List<BluetoothDevice>>(
+                stream: bt.pairedDevicesStream,
+                initialData: [],
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text("error: ${snapshot.error}");
+                  }
+                  if (snapshot.hasData != true) return const Text("wait...");
+                  return Column(
+                    children: snapshot.data!
+                        .map((e) => Text(
+                              "${e.name} ; "
+                              "${e.alias ?? "null"} ; "
+                              "${e.address} ; "
+                              "${e.isConnected ? "✅" : "❌"}",
+                            ))
+                        .toList(),
+                  );
+                },
+              ),
             ],
           ),
         ),
