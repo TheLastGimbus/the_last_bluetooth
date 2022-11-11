@@ -39,6 +39,20 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
+    @SuppressLint("InlinedApi")
+    private val listenedBluetoothBroadcasts = listOf(
+        BluetoothDevice.ACTION_ACL_CONNECTED,
+        BluetoothDevice.ACTION_ACL_DISCONNECTED,
+        BluetoothDevice.ACTION_BOND_STATE_CHANGED,
+        BluetoothDevice.ACTION_NAME_CHANGED,
+        BluetoothDevice.ACTION_ALIAS_CHANGED,
+        // TODO: Actually include those two in the data?
+        // BluetoothDevice.ACTION_UUID,
+        // BluetoothDevice.ACTION_CLASS_CHANGED,
+        // TODO: Listen and react to this (close connections)
+        // BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED,
+    )
+
 
     @SuppressLint("MissingPermission")
     private fun getPairedDevices(): List<HashMap<String, Any?>> = bluetoothAdapter!!.bondedDevices.map {
@@ -59,8 +73,9 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
         if (bluetoothAdapter == null) return;
 
         val filter = IntentFilter().apply {
-            addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-            addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+            for (br in listenedBluetoothBroadcasts) addAction(br)
+            // TODO: Check if this doens't *require* check (eg crashes otherwise) - else, just leave it in the list
+            // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) addAction(BluetoothDevice.ACTION_ALIAS_CHANGED)
         }
         ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_EXPORTED)
         Log.d(TAG, "LISTENING.......")
@@ -95,7 +110,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
     @SuppressLint("MissingPermission")  // Let user decide which permission they want
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            BluetoothDevice.ACTION_ACL_CONNECTED, BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+            in listenedBluetoothBroadcasts -> {
                 Log.v(TAG, "Device changed: ${intent.extras?.itemsToString()}")
                 // I actually don't care about this, since we're just sending the new list anyway
                 // val dev = intent.extras?.get(BluetoothDevice.EXTRA_DEVICE) as BluetoothDevice?
