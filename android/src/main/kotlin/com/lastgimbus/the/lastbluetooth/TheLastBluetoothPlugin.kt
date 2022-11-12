@@ -22,7 +22,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 
 
 /** TheLastBluetoothPlugin */
-class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiver(), EventChannel.StreamHandler {
+class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiver() {
     companion object {
         const val TAG = "TheLastBluetoothPlugin"
     }
@@ -65,7 +65,16 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
         channel.setMethodCallHandler(this)
         eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream")
-        eventChannel.setStreamHandler(this);
+        eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                eventSink = events
+                eventSink!!.success(getPairedDevices())
+            }
+
+            override fun onCancel(arguments: Any?) {
+                eventSink = null
+            }
+        });
 
         val context: Context = flutterPluginBinding.applicationContext
         val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
@@ -119,17 +128,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
 
             else -> Log.wtf(TAG, "This receiver should not get this intent: $intent")
         }
-    }
-
-    // ##### EventSink stuff #####
-    override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
-        eventSink = events
-        eventSink!!.success(getPairedDevices())
-    }
-
-    override fun onCancel(arguments: Any?) {
-        eventSink?.endOfStream()
-        eventSink = null
     }
 }
 
