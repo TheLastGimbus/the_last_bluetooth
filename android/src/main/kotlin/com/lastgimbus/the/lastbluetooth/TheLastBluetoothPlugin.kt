@@ -21,7 +21,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 
 
 /** TheLastBluetoothPlugin */
-class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiver() {
+class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     companion object {
         const val TAG = "TheLastBluetoothPlugin"
     }
@@ -38,19 +38,34 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
-    @SuppressLint("InlinedApi")
-    private val listenedBluetoothBroadcasts = listOf(
-        BluetoothDevice.ACTION_ACL_CONNECTED,
-        BluetoothDevice.ACTION_ACL_DISCONNECTED,
-        BluetoothDevice.ACTION_BOND_STATE_CHANGED,
-        BluetoothDevice.ACTION_NAME_CHANGED,
-        BluetoothDevice.ACTION_ALIAS_CHANGED,
-        // TODO: Actually include those two in the data?
-        // BluetoothDevice.ACTION_UUID,
-        // BluetoothDevice.ACTION_CLASS_CHANGED,
-        // TODO: Listen and react to this (close connections)
-        // BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED,
-    )
+    private val broadcastReceiverPairedDevices = object : BroadcastReceiver() {
+        @SuppressLint("InlinedApi")
+        val listenedBluetoothBroadcasts = listOf(
+            BluetoothDevice.ACTION_ACL_CONNECTED,
+            BluetoothDevice.ACTION_ACL_DISCONNECTED,
+            BluetoothDevice.ACTION_BOND_STATE_CHANGED,
+            BluetoothDevice.ACTION_NAME_CHANGED,
+            // TODO: Check if this doens't *require* check (eg crashes otherwise) - else, just leave it in the list
+            BluetoothDevice.ACTION_ALIAS_CHANGED,
+            // TODO: Actually include those two in the data?
+            // BluetoothDevice.ACTION_UUID,
+            // BluetoothDevice.ACTION_CLASS_CHANGED,
+            // TODO: Listen and react to this (close connections)
+            // BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED,
+        )
+        val intentFilter = IntentFilter().apply { listenedBluetoothBroadcasts.forEach { addAction(it) } }
+
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                in listenedBluetoothBroadcasts -> {
+                    Log.v(TAG, "Device changed (${intent.action}): ${intent.extras?.itemsToString()}")
+                    eventSink?.success(getPairedDevices())  // Just send list of all devices (not only one changed)
+                }
+
+                else -> Log.wtf(TAG, "This receiver should not get this intent: $intent")
+            }
+        }
+    }
 
 
     @SuppressLint("MissingPermission")
@@ -67,19 +82,13 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
         eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream")
         eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                val filter = IntentFilter().apply {
-                    for (br in listenedBluetoothBroadcasts) addAction(br)
-                    // TODO: Check if this doens't *require* check (eg crashes otherwise) - else, just leave it in the list
-                    // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) addAction(BluetoothDevice.ACTION_ALIAS_CHANGED)
-                }
-                // TODO: Also change this away from "this" because we want multiple of these
-                context.registerReceiver(this@TheLastBluetoothPlugin, filter)
                 eventSink = events
                 eventSink!!.success(getPairedDevices())
+                context.registerReceiver(broadcastReceiverPairedDevices, broadcastReceiverPairedDevices.intentFilter)
             }
 
             override fun onCancel(arguments: Any?) {
-                context.unregisterReceiver(this@TheLastBluetoothPlugin)
+                context.unregisterReceiver(broadcastReceiverPairedDevices)
                 eventSink = null
             }
         });
@@ -109,23 +118,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
             "getName" -> result.success(bluetoothAdapter!!.name)
             "getPairedDevices" -> result.success(getPairedDevices())
             else -> result.notImplemented()
-        }
-    }
-
-
-    // ##### BroadcastReceiver stuff #####
-    // BroadcastReceiver (for BluetoothDevice.ACTION_ACL_CONNECTED and BluetoothDevice.ACTION_ACL_DISCONNECTED)
-    @SuppressLint("MissingPermission")  // Let user decide which permission they want
-    override fun onReceive(context: Context, intent: Intent) {
-        when (intent.action) {
-            in listenedBluetoothBroadcasts -> {
-                Log.v(TAG, "Device changed: ${intent.extras?.itemsToString()}")
-                // I actually don't care about this, since we're just sending the new list anyway
-                // val dev = intent.extras?.get(BluetoothDevice.EXTRA_DEVICE) as BluetoothDevice?
-                eventSink?.success(getPairedDevices())
-            }
-
-            else -> Log.wtf(TAG, "This receiver should not get this intent: $intent")
         }
     }
 }
