@@ -26,4 +26,18 @@ class BluetoothDevice {
         "address": address,
         "isConnected": isConnected,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BluetoothDevice &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          alias == other.alias &&
+          address == other.address &&
+          isConnected == other.isConnected;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ alias.hashCode ^ address.hashCode ^ isConnected.hashCode;
 }
