@@ -12,7 +12,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
-import androidx.core.content.ContextCompat
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -62,32 +61,32 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler, BroadcastReceiv
 
     // ##### FlutterPlugin stuff #####
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        val context: Context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
         channel.setMethodCallHandler(this)
         eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream")
         eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                val filter = IntentFilter().apply {
+                    for (br in listenedBluetoothBroadcasts) addAction(br)
+                    // TODO: Check if this doens't *require* check (eg crashes otherwise) - else, just leave it in the list
+                    // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) addAction(BluetoothDevice.ACTION_ALIAS_CHANGED)
+                }
+                // TODO: Also change this away from "this" because we want multiple of these
+                context.registerReceiver(this@TheLastBluetoothPlugin, filter)
                 eventSink = events
                 eventSink!!.success(getPairedDevices())
             }
 
             override fun onCancel(arguments: Any?) {
+                context.unregisterReceiver(this@TheLastBluetoothPlugin)
                 eventSink = null
             }
         });
 
-        val context: Context = flutterPluginBinding.applicationContext
         val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
         bluetoothAdapter = bm?.adapter
         if (bluetoothAdapter == null) return;
-
-        val filter = IntentFilter().apply {
-            for (br in listenedBluetoothBroadcasts) addAction(br)
-            // TODO: Check if this doens't *require* check (eg crashes otherwise) - else, just leave it in the list
-            // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) addAction(BluetoothDevice.ACTION_ALIAS_CHANGED)
-        }
-        ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_EXPORTED)
-        Log.d(TAG, "LISTENING.......")
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
