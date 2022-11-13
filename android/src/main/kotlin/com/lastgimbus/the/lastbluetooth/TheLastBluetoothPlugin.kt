@@ -24,9 +24,8 @@ import io.flutter.plugin.common.MethodChannel.Result
 class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     companion object {
         const val TAG = "TheLastBluetoothPlugin"
+        const val PLUGIN_NAMESPACE = "the_last_bluetooth"
     }
-
-    private val PLUGIN_NAMESPACE = "the_last_bluetooth"
 
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
@@ -55,7 +54,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
     private val broadcastReceiverPairedDevices = object : BroadcastReceiver() {
         @SuppressLint("InlinedApi")
-        val listenedBluetoothBroadcasts = listOf(
+        val listenedBroadcasts = listOf(
             BluetoothDevice.ACTION_ACL_CONNECTED,
             BluetoothDevice.ACTION_ACL_DISCONNECTED,
             BluetoothDevice.ACTION_BOND_STATE_CHANGED,
@@ -68,11 +67,11 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             // TODO: Listen and react to this (close connections)
             // BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED,
         )
-        val intentFilter = IntentFilter().apply { listenedBluetoothBroadcasts.forEach { addAction(it) } }
+        val intentFilter = IntentFilter().apply { listenedBroadcasts.forEach { addAction(it) } }
 
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                in listenedBluetoothBroadcasts -> {
+                in listenedBroadcasts -> {
                     Log.v(TAG, "Device changed (${intent.action}): ${intent.extras?.itemsToString()}")
                     eventSinkPairedDevices?.success(getPairedDevices())  // Just send list of all devices (not only one changed)
                 }
@@ -117,8 +116,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
                 }
             })
         }
-
-
         EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/pairedDevices").apply {
             setStreamHandler(object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -138,7 +135,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
         val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
         bluetoothAdapter = bm?.adapter
-        if (bluetoothAdapter == null) return;
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
