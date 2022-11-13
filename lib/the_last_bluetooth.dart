@@ -13,8 +13,8 @@ class TheLastBluetooth {
   static const MethodChannel _methodChannel =
       MethodChannel('$namespace/methods');
 
-  static const EventChannel _devicesEventChannel =
-      EventChannel('devicesStream');
+  static const EventChannel _ecPairedDevices =
+      EventChannel('$namespace/pairedDevices');
 
   Stream<dynamic>? _devicesStream;
 
@@ -44,7 +44,7 @@ class TheLastBluetooth {
 
   Stream<List<BluetoothDevice>> get pairedDevicesStream {
     // If you don't copy this, will not work on multiple widgets
-    _devicesStream ??= _devicesEventChannel.receiveBroadcastStream();
+    _devicesStream ??= _ecPairedDevices.receiveBroadcastStream();
     return _devicesStream!.map((event) {
       if (event is! List<Object?>) {
         throw 'WTF: $event is not List<Object?> - ${event.runtimeType} instead :/';

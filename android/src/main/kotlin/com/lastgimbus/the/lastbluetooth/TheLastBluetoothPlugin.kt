@@ -33,7 +33,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
-    private var eventSink: EventChannel.EventSink? = null    // TODO: Rename it if we will need more than 1 of these
+    private var eventSinkPairedDevices: EventChannel.EventSink? = null
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
@@ -58,7 +58,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             when (intent.action) {
                 in listenedBluetoothBroadcasts -> {
                     Log.v(TAG, "Device changed (${intent.action}): ${intent.extras?.itemsToString()}")
-                    eventSink?.success(getPairedDevices())  // Just send list of all devices (not only one changed)
+                    eventSinkPairedDevices?.success(getPairedDevices())  // Just send list of all devices (not only one changed)
                 }
 
                 else -> Log.wtf(TAG, "This receiver should not get this intent: $intent")
@@ -79,20 +79,19 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
         channel.setMethodCallHandler(this)
 
-        EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream").apply {
+        EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/pairedDevices").apply {
             setStreamHandler(object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                    eventSink = events
-                    eventSink!!.success(getPairedDevices())
+                    eventSinkPairedDevices = events
+                    eventSinkPairedDevices!!.success(getPairedDevices())
                     context.registerReceiver(
-                        broadcastReceiverPairedDevices,
-                        broadcastReceiverPairedDevices.intentFilter
+                        broadcastReceiverPairedDevices, broadcastReceiverPairedDevices.intentFilter
                     )
                 }
 
                 override fun onCancel(arguments: Any?) {
                     context.unregisterReceiver(broadcastReceiverPairedDevices)
-                    eventSink = null
+                    eventSinkPairedDevices = null
                 }
             })
         }
