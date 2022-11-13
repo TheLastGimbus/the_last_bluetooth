@@ -33,7 +33,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
-    private lateinit var eventChannel: EventChannel
     private var eventSink: EventChannel.EventSink? = null    // TODO: Rename it if we will need more than 1 of these
 
     private var bluetoothAdapter: BluetoothAdapter? = null
@@ -79,19 +78,24 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         val context: Context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
         channel.setMethodCallHandler(this)
-        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream")
-        eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
-            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                eventSink = events
-                eventSink!!.success(getPairedDevices())
-                context.registerReceiver(broadcastReceiverPairedDevices, broadcastReceiverPairedDevices.intentFilter)
-            }
 
-            override fun onCancel(arguments: Any?) {
-                context.unregisterReceiver(broadcastReceiverPairedDevices)
-                eventSink = null
-            }
-        });
+        EventChannel(flutterPluginBinding.binaryMessenger, "devicesStream").apply {
+            setStreamHandler(object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    eventSink = events
+                    eventSink!!.success(getPairedDevices())
+                    context.registerReceiver(
+                        broadcastReceiverPairedDevices,
+                        broadcastReceiverPairedDevices.intentFilter
+                    )
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    context.unregisterReceiver(broadcastReceiverPairedDevices)
+                    eventSink = null
+                }
+            })
+        }
 
         val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
         bluetoothAdapter = bm?.adapter
