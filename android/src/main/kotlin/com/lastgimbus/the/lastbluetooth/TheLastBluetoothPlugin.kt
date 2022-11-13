@@ -33,9 +33,25 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
+    private var eventSinkAdapterInfo: EventChannel.EventSink? = null
     private var eventSinkPairedDevices: EventChannel.EventSink? = null
 
     private var bluetoothAdapter: BluetoothAdapter? = null
+
+    private val broadcastReceiverAdapterInfo = object : BroadcastReceiver() {
+        val listenedBroadcasts = listOf(
+            BluetoothAdapter.ACTION_STATE_CHANGED,
+            BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED,
+        )
+        val intentFilter = IntentFilter().apply {
+            listenedBroadcasts.forEach { addAction(it) }
+        }
+
+        override fun onReceive(context: Context, intent: Intent) {
+            eventSinkAdapterInfo?.success(getAdapterInfo())
+        }
+
+    }
 
     private val broadcastReceiverPairedDevices = object : BroadcastReceiver() {
         @SuppressLint("InlinedApi")
@@ -66,6 +82,14 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private fun getAdapterInfo(): HashMap<String, Any?> = hashMapOf(
+        "isAvailable" to (bluetoothAdapter != null),
+        "isEnabled" to (bluetoothAdapter?.isEnabled ?: false),
+        "name" to (bluetoothAdapter?.name),
+        "address" to null,  // Android studio doesn't recommend me this, so will be disabled on android for now
+    )
+
 
     @SuppressLint("MissingPermission")
     private fun getPairedDevices(): List<HashMap<String, Any?>> = bluetoothAdapter!!.bondedDevices.map {
@@ -78,6 +102,22 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         val context: Context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/methods")
         channel.setMethodCallHandler(this)
+
+        EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/adapterInfo").apply {
+            setStreamHandler(object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    eventSinkAdapterInfo = events
+                    eventSinkAdapterInfo!!.success(getAdapterInfo())
+                    context.registerReceiver(broadcastReceiverAdapterInfo, broadcastReceiverAdapterInfo.intentFilter)
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    context.unregisterReceiver(broadcastReceiverAdapterInfo)
+                    eventSinkAdapterInfo = null
+                }
+            })
+        }
+
 
         EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/pairedDevices").apply {
             setStreamHandler(object : EventChannel.StreamHandler {

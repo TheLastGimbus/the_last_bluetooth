@@ -30,17 +30,13 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Column(
             children: [
-              FutureBuilder<bool>(
-                future: bt.isEnabled(),
-                initialData: false,
-                builder: (context, snapshot) => Text(
-                    "is enabled: ${snapshot.hasError ? 'error' : snapshot.data}"),
-              ),
-              FutureBuilder<String>(
-                future: bt.adapterName,
-                initialData: "wait...",
-                builder: (context, snapshot) => Text(
-                    "adapter name: ${snapshot.hasError ? 'error' : snapshot.data}"),
+              StreamBuilder(
+                stream: bt.adapterInfoStream,
+                builder: (context, snapshot) {
+                  return snapshot.hasData
+                      ? Text(snapshot.data.toString())
+                      : const Text("No data");
+                },
               ),
               const Text("paired devs (NEW 💯 - STREAM):"),
               StreamBuilder<List<BluetoothDevice>>(

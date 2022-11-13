@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:the_last_bluetooth/src/bluetooth_adapter.dart';
 import 'package:the_last_bluetooth/src/bluetooth_device.dart';
 
 export './src/bluetooth_device.dart';
@@ -13,9 +14,12 @@ class TheLastBluetooth {
   static const MethodChannel _methodChannel =
       MethodChannel('$namespace/methods');
 
+  static const EventChannel _ecAdapterInfo =
+      EventChannel('$namespace/adapterInfo');
   static const EventChannel _ecPairedDevices =
       EventChannel('$namespace/pairedDevices');
 
+  Stream<BluetoothAdapter>? _adapterInfoStream;
   Stream<dynamic>? _devicesStream;
 
   TheLastBluetooth._() {
@@ -40,6 +44,13 @@ class TheLastBluetooth {
     final devs =
         await _methodChannel.invokeMethod<List>('getPairedDevices') ?? [];
     return devs.map((e) => BluetoothDevice.fromMap(e)).toList();
+  }
+
+  Stream<BluetoothAdapter> get adapterInfoStream {
+    _adapterInfoStream ??= _ecAdapterInfo
+        .receiveBroadcastStream()
+        .map((event) => BluetoothAdapter.fromMap(event));
+    return _adapterInfoStream!;
   }
 
   Stream<List<BluetoothDevice>> get pairedDevicesStream {
