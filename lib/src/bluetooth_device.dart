@@ -28,6 +28,10 @@ class BluetoothDevice {
       };
 
   @override
+  String toString() =>
+      'BluetoothDevice("$name" (alias: "$alias"), $address, ${isConnected ? 'connected✅' : 'disconnected❌'})';
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is BluetoothDevice &&
