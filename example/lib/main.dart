@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';
 
@@ -15,9 +17,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final bt = TheLastBluetooth.instance;
 
+  // Fallen into my own trap of "only first listen gets initial devices"
+  List<BluetoothDevice> devices = [];
+  BluetoothConnection? conn;
+
   @override
   void initState() {
     super.initState();
+    bt.pairedDevicesStream.listen((event) {
+      setState(() {
+        devices = event;
+      });
+    });
   }
 
   @override
@@ -39,26 +50,59 @@ class _MyAppState extends State<MyApp> {
                 },
               ),
               const Text("paired devs (NEW 💯 - STREAM):"),
-              StreamBuilder<List<BluetoothDevice>>(
-                stream: bt.pairedDevicesStream,
-                initialData: [],
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text("error: ${snapshot.error}");
+              // StreamBuilder<List<BluetoothDevice>>(
+              //   stream: bt.pairedDevicesStream,
+              //   initialData: [],
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasError) {
+              //       return Text("error: ${snapshot.error}");
+              //     }
+              //     if (snapshot.hasData != true) return const Text("wait...");
+              //     return Column(
+              //       children: snapshot.data!
+              //           .map((e) => Text(
+              //                 "${e.name} ; "
+              //                 "${e.alias ?? "null"} ; "
+              //                 "${e.address} ; "
+              //                 "${e.isConnected ? "✅" : "❌"}",
+              //               ))
+              //           .toList(),
+              //     );
+              //   },
+              // ),
+
+              // my own trap
+              ...devices
+                  .map((e) => Text(
+                        "${e.name} ; "
+                        "${e.alias ?? "null"} ; "
+                        "${e.address} ; "
+                        "${e.isConnected ? "✅" : "❌"}",
+                      ))
+                  .toList(),
+
+              // @Shit("Temporary shitty code to test sending"
+              TextButton(
+                onPressed: () async {
+                  try {
+                    conn = await bt.connectRfcomm(
+                        devices.firstWhere((e) => e.isConnected));
+                    conn!.input.listen(print);
+                    setState(() {});
+                  } catch (e) {
+                    print(e);
                   }
-                  if (snapshot.hasData != true) return const Text("wait...");
-                  return Column(
-                    children: snapshot.data!
-                        .map((e) => Text(
-                              "${e.name} ; "
-                              "${e.alias ?? "null"} ; "
-                              "${e.address} ; "
-                              "${e.isConnected ? "✅" : "❌"}",
-                            ))
-                        .toList(),
-                  );
                 },
+                child: Text("Connect"),
               ),
+              if (conn != null)
+                TextButton(
+                  onPressed: () {
+                    conn!.output.add(Uint8List.fromList(
+                        [90, 0, 7, 0, 43, 4, 1, 2, 1, -1, -1, -20]));
+                  },
+                  child: Text("send"),
+                ),
             ],
           ),
         ),

@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:the_last_bluetooth/src/bluetooth_adapter.dart';
 import 'package:the_last_bluetooth/src/bluetooth_device.dart';
 
+import 'src/bluetooth_connection.dart';
+
+export './src/bluetooth_adapter.dart';
+export './src/bluetooth_connection.dart';
 export './src/bluetooth_device.dart';
 
 class TheLastBluetooth {
@@ -19,6 +25,12 @@ class TheLastBluetooth {
   static const EventChannel _ecPairedDevices =
       EventChannel('$namespace/pairedDevices');
 
+  // @Shit
+  // NOTE: For now, i literally support only one connection
+  static const EventChannel _ecRfcomm = EventChannel('$namespace/rfcomm');
+  StreamController<Uint8List>? _scRfcommInput;
+  StreamController<Uint8List>? _scRfcommOutput;
+
   Stream<BluetoothAdapter>? _adapterInfoStream;
   Stream<List<BluetoothDevice>>? _devicesStream;
 
@@ -29,6 +41,11 @@ class TheLastBluetooth {
           throw "Unknown method ${call.method}";
       }
     });
+
+    // @Shit
+    _ecRfcomm
+        .receiveBroadcastStream()
+        .listen((event) => _scRfcommInput?.add(event));
   }
 
   Future<bool> isAvailable() async =>
@@ -66,5 +83,15 @@ class TheLastBluetooth {
       return event.map((d) => BluetoothDevice.fromMap(d as Map)).toList();
     });
     return _devicesStream!;
+  }
+
+  // @Shit
+  Future<BluetoothConnection> connectRfcomm(BluetoothDevice device) async {
+    await _methodChannel.invokeMethod('connectRfcomm', device.toMap());
+    _scRfcommInput = StreamController();
+    _scRfcommOutput = StreamController();
+    _scRfcommOutput!.stream.listen(
+        (event) => _methodChannel.invokeMethod("rfcommWrite", {"data": event}));
+    return BluetoothConnection(_scRfcommInput!.stream, _scRfcommOutput!.sink);
   }
 }

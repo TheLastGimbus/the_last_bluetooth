@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -18,6 +19,11 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.*
 
 
 /** TheLastBluetoothPlugin */
@@ -35,7 +41,16 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     private var eventSinkAdapterInfo: EventChannel.EventSink? = null
     private var eventSinkPairedDevices: EventChannel.EventSink? = null
 
+    // @Shit
+    private var eventSinkRfcomm: EventChannel.EventSink? = null
+
     private var bluetoothAdapter: BluetoothAdapter? = null
+
+    // @Shit
+    private val bluetoothUuidSpp = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
+
+    // @Shit
+    private var bluetoothSocket: BluetoothSocket? = null
 
     private val broadcastReceiverAdapterInfo = object : BroadcastReceiver() {
         val listenedBroadcasts = listOf(
@@ -96,6 +111,32 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         hashMapOf("name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected)
     }
 
+    // @Shit
+    @SuppressLint("MissingPermission")
+    private fun connectRfcomm(dev: BluetoothDevice) {
+        if (bluetoothSocket != null) {
+            Log.w(TAG, "Already connected to device")
+            return
+        }
+        bluetoothSocket = dev.createRfcommSocketToServiceRecord(bluetoothUuidSpp)
+        // connect with coroutine
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                bluetoothSocket!!.connect()
+                Log.i(TAG, "Connected to ${dev.name}")
+                while (true) {
+                    // read 1024 bytes of data:
+                    val buffer = ByteArray(1024)
+                    val read = bluetoothSocket!!.inputStream.read(buffer)
+                    val finalBytes = buffer.copyOfRange(0, read)
+                    // send to eventsink on ui thread:
+                    withContext(Dispatchers.Main) { eventSinkRfcomm?.success(finalBytes) }
+                }
+            }
+        }
+
+    }
+
     // ##### FlutterPlugin stuff #####
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         val context: Context = flutterPluginBinding.applicationContext
@@ -133,6 +174,20 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             })
         }
 
+        // @Shit
+        EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/rfcomm").apply {
+            setStreamHandler(object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    eventSinkRfcomm = events
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    eventSinkRfcomm = null
+                }
+
+            })
+        }
+
         val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager?
         bluetoothAdapter = bm?.adapter
     }
@@ -156,6 +211,18 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
             "getName" -> result.success(bluetoothAdapter!!.name)
             "getPairedDevices" -> result.success(getPairedDevices())
+            // @Shit
+            "connectRfcomm" -> {
+                val address = call.argument<String>("address")!!
+                val dev = bluetoothAdapter!!.getRemoteDevice(address)
+                connectRfcomm(dev)
+                result.success(true)
+            }
+            // @Shit
+            "rfcommWrite" -> {
+                bluetoothSocket?.outputStream?.write(call.argument("data"))
+            }
+
             else -> result.notImplemented()
         }
     }
