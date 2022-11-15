@@ -20,7 +20,7 @@ class TheLastBluetooth {
       EventChannel('$namespace/pairedDevices');
 
   Stream<BluetoothAdapter>? _adapterInfoStream;
-  Stream<dynamic>? _devicesStream;
+  Stream<List<BluetoothDevice>>? _devicesStream;
 
   TheLastBluetooth._() {
     _methodChannel.setMethodCallHandler((MethodCall call) async {
@@ -53,14 +53,18 @@ class TheLastBluetooth {
     return _adapterInfoStream!;
   }
 
+  // Emits current state, but only on first listen
+  // Because of this, StreamBuilders built after first (for example, on second
+  // page) don't work until there's any update :/
+  // I don't know what would be a good solution for this now - there isn't such
+  // a thing as "myStream.latest" or smth. Figure this out later
   Stream<List<BluetoothDevice>> get pairedDevicesStream {
-    // If you don't copy this, will not work on multiple widgets
-    _devicesStream ??= _ecPairedDevices.receiveBroadcastStream();
-    return _devicesStream!.map((event) {
+    _devicesStream ??= _ecPairedDevices.receiveBroadcastStream().map((event) {
       if (event is! List<Object?>) {
         throw 'WTF: $event is not List<Object?> - ${event.runtimeType} instead :/';
       }
       return event.map((d) => BluetoothDevice.fromMap(d as Map)).toList();
     });
+    return _devicesStream!;
   }
 }
