@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
                   try {
                     conn = await bt.connectRfcomm(
                         devices.firstWhere((e) => e.isConnected));
-                    conn!.input.listen(print);
+                    conn!.io.stream.listen(print);
                     setState(() {});
                   } catch (e) {
                     print(e);
@@ -98,7 +98,7 @@ class _MyAppState extends State<MyApp> {
               if (conn != null)
                 TextButton(
                   onPressed: () {
-                    conn!.output.add(Uint8List.fromList(
+                    conn!.io.sink.add(Uint8List.fromList(
                         [90, 0, 7, 0, 43, 4, 1, 2, 1, -1, -1, -20]));
                   },
                   child: Text("send"),

@@ -1,13 +1,12 @@
-import 'dart:async';
 import 'dart:typed_data';
+
+import 'package:stream_channel/stream_channel.dart';
 
 // NOTE: No idea how to implement stuff here - closing etc
 class BluetoothConnection {
-  final Stream<Uint8List> input;
-  final StreamSink<Uint8List> output;
+  final StreamChannel<Uint8List> io;
 
   const BluetoothConnection(
-    this.input,
-    this.output,
+    this.io,
   );
 }

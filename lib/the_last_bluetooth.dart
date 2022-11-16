@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/src/bluetooth_adapter.dart';
 import 'package:the_last_bluetooth/src/bluetooth_device.dart';
 
@@ -28,8 +29,7 @@ class TheLastBluetooth {
   // @Shit
   // NOTE: For now, i literally support only one connection
   static const EventChannel _ecRfcomm = EventChannel('$namespace/rfcomm');
-  StreamController<Uint8List>? _scRfcommInput;
-  StreamController<Uint8List>? _scRfcommOutput;
+  final Map<String, StreamSink<Uint8List>> _rfcommChannels = {};
 
   Stream<BluetoothAdapter>? _adapterInfoStream;
   Stream<List<BluetoothDevice>>? _devicesStream;
@@ -43,9 +43,13 @@ class TheLastBluetooth {
     });
 
     // @Shit
-    _ecRfcomm
-        .receiveBroadcastStream()
-        .listen((event) => _scRfcommInput?.add(event));
+    _ecRfcomm.receiveBroadcastStream().listen((event) {
+      print("Rfcomm from android: $event");
+      final String socketId = event['socketId'];
+      _rfcommChannels.containsKey(socketId)
+          ? _rfcommChannels[socketId]!.add(event['data'])
+          : print("No channel for socketId $socketId!");
+    });
   }
 
   Future<bool> isAvailable() async =>
@@ -87,11 +91,17 @@ class TheLastBluetooth {
 
   // @Shit
   Future<BluetoothConnection> connectRfcomm(BluetoothDevice device) async {
-    await _methodChannel.invokeMethod('connectRfcomm', device.toMap());
-    _scRfcommInput = StreamController();
-    _scRfcommOutput = StreamController();
-    _scRfcommOutput!.stream.listen(
-        (event) => _methodChannel.invokeMethod("rfcommWrite", {"data": event}));
-    return BluetoothConnection(_scRfcommInput!.stream, _scRfcommOutput!.sink);
+    final socketId = (await _methodChannel.invokeMethod<String>(
+        'connectRfcomm', device.toMap()))!;
+    final input = StreamController<Uint8List>();
+    final output = StreamController<Uint8List>();
+    output.stream.listen((event) {
+      print("rfcomm write from flutter: $socketId: $event");
+      _methodChannel
+          .invokeMethod("rfcommWrite", {"socketId": socketId, "data": event});
+    });
+    _rfcommChannels[socketId] = input.sink;
+    return BluetoothConnection(
+        StreamChannel.withGuarantees(input.stream, output.sink));
   }
 }

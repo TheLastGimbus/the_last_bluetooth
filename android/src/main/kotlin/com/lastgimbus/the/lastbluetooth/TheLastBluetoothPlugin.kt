@@ -43,14 +43,12 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
     // @Shit
     private var eventSinkRfcomm: EventChannel.EventSink? = null
+    private val rfcommSocketMap = mutableMapOf<String, BluetoothSocket>()
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     // @Shit
     private val bluetoothUuidSpp = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-
-    // @Shit
-    private var bluetoothSocket: BluetoothSocket? = null
 
     private val broadcastReceiverAdapterInfo = object : BroadcastReceiver() {
         val listenedBroadcasts = listOf(
@@ -113,28 +111,35 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
     // @Shit
     @SuppressLint("MissingPermission")
-    private fun connectRfcomm(dev: BluetoothDevice) {
-        if (bluetoothSocket != null) {
+    private fun connectRfcomm(dev: BluetoothDevice, serviceUUID: UUID): String {
+        val socketId = "$PLUGIN_NAMESPACE/rfcomm/${dev.address}/${serviceUUID}"
+        if (rfcommSocketMap.containsKey(socketId)) {
             Log.w(TAG, "Already connected to device")
-            return
+            return socketId
         }
-        bluetoothSocket = dev.createRfcommSocketToServiceRecord(bluetoothUuidSpp)
-        // connect with coroutine
+        rfcommSocketMap[socketId] = dev.createRfcommSocketToServiceRecord(serviceUUID)
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                bluetoothSocket!!.connect()
+                rfcommSocketMap[socketId]!!.connect()
                 Log.i(TAG, "Connected to ${dev.name}")
                 while (true) {
                     // read 1024 bytes of data:
                     val buffer = ByteArray(1024)
-                    val read = bluetoothSocket!!.inputStream.read(buffer)
+                    val read = rfcommSocketMap[socketId]!!.inputStream.read(buffer)
                     val finalBytes = buffer.copyOfRange(0, read)
                     // send to eventsink on ui thread:
-                    withContext(Dispatchers.Main) { eventSinkRfcomm?.success(finalBytes) }
+                    withContext(Dispatchers.Main) {
+                        eventSinkRfcomm?.success(
+                            hashMapOf(
+                                "socketId" to socketId,
+                                "data" to finalBytes
+                            )
+                        )
+                    }
                 }
             }
         }
-
+        return socketId
     }
 
     // ##### FlutterPlugin stuff #####
@@ -215,12 +220,11 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             "connectRfcomm" -> {
                 val address = call.argument<String>("address")!!
                 val dev = bluetoothAdapter!!.getRemoteDevice(address)
-                connectRfcomm(dev)
-                result.success(true)
+                result.success(connectRfcomm(dev, bluetoothUuidSpp))
             }
             // @Shit
             "rfcommWrite" -> {
-                bluetoothSocket?.outputStream?.write(call.argument("data"))
+                rfcommSocketMap[call.argument<String>("socketId")!!]!!.outputStream.write(call.argument<ByteArray>("data")!!)
             }
 
             else -> result.notImplemented()
