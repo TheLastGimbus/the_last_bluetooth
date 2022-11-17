@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -41,13 +40,13 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     private var eventSinkAdapterInfo: EventChannel.EventSink? = null
     private var eventSinkPairedDevices: EventChannel.EventSink? = null
 
-    // @Shit
+    @Shit
     private var eventSinkRfcomm: EventChannel.EventSink? = null
     private val rfcommSocketMap = mutableMapOf<String, BluetoothSocket>()
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
-    // @Shit
+    @Shit
     private val bluetoothUuidSpp = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
 
     private val broadcastReceiverAdapterInfo = object : BroadcastReceiver() {
@@ -109,7 +108,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         hashMapOf("name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected)
     }
 
-    // @Shit
+    @Shit
     @SuppressLint("MissingPermission")
     private fun connectRfcomm(dev: BluetoothDevice, serviceUUID: UUID): String {
         val socketId = "$PLUGIN_NAMESPACE/rfcomm/${dev.address}/${serviceUUID}"
@@ -131,8 +130,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
                     withContext(Dispatchers.Main) {
                         eventSinkRfcomm?.success(
                             hashMapOf(
-                                "socketId" to socketId,
-                                "data" to finalBytes
+                                "socketId" to socketId, "data" to finalBytes
                             )
                         )
                     }
@@ -179,8 +177,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             })
         }
 
-        // @Shit
-        EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/rfcomm").apply {
+        @Shit EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/rfcomm").apply {
             setStreamHandler(object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                     eventSinkRfcomm = events
@@ -216,14 +213,13 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
             "getName" -> result.success(bluetoothAdapter!!.name)
             "getPairedDevices" -> result.success(getPairedDevices())
-            // @Shit
-            "connectRfcomm" -> {
+            @Shit "connectRfcomm" -> {
                 val address = call.argument<String>("address")!!
                 val dev = bluetoothAdapter!!.getRemoteDevice(address)
                 result.success(connectRfcomm(dev, bluetoothUuidSpp))
             }
-            // @Shit
-            "rfcommWrite" -> {
+
+            @Shit "rfcommWrite" -> {
                 rfcommSocketMap[call.argument<String>("socketId")!!]!!.outputStream.write(call.argument<ByteArray>("data")!!)
             }
 
@@ -231,15 +227,3 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 }
-
-// ##### Shitty extension functions section #####
-
-// XDDDDD
-// TODO: Move this to some btutils or smth
-private val BluetoothDevice.isConnected: Boolean
-    get() = this.javaClass.getMethod("isConnected").invoke(this) as Boolean
-
-private fun Bundle.itemsToString(): String =
-    this.keySet().joinToString(", ") { "$it: <${this.get(it)?.javaClass?.name}>${this.get(it)}" }
-
-

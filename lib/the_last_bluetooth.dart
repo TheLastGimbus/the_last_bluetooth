@@ -6,6 +6,7 @@ import 'package:the_last_bluetooth/src/bluetooth_adapter.dart';
 import 'package:the_last_bluetooth/src/bluetooth_device.dart';
 
 import 'src/bluetooth_connection.dart';
+import 'src/shit_utils.dart';
 
 export './src/bluetooth_adapter.dart';
 export './src/bluetooth_connection.dart';
@@ -26,8 +27,8 @@ class TheLastBluetooth {
   static const EventChannel _ecPairedDevices =
       EventChannel('$namespace/pairedDevices');
 
-  // @Shit
   // NOTE: For now, i literally support only one connection
+  @Shit()
   static const EventChannel _ecRfcomm = EventChannel('$namespace/rfcomm');
   final Map<String, StreamSink<Uint8List>> _rfcommChannels = {};
 
@@ -42,7 +43,7 @@ class TheLastBluetooth {
       }
     });
 
-    // @Shit
+    // @Shit()
     _ecRfcomm.receiveBroadcastStream().listen((event) {
       print("Rfcomm from android: $event");
       final String socketId = event['socketId'];
@@ -89,8 +90,10 @@ class TheLastBluetooth {
     return _devicesStream!;
   }
 
-  // @Shit
+  @Shit()
+  @Deprecated("dupala")
   Future<BluetoothConnection> connectRfcomm(BluetoothDevice device) async {
+    connectRfcomm(device);
     final socketId = (await _methodChannel.invokeMethod<String>(
         'connectRfcomm', device.toMap()))!;
     final input = StreamController<Uint8List>();
