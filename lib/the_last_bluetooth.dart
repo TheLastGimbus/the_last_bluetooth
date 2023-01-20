@@ -93,7 +93,6 @@ class TheLastBluetooth {
   @Shit()
   @Deprecated("dupala")
   Future<BluetoothConnection> connectRfcomm(BluetoothDevice device) async {
-    connectRfcomm(device);
     final socketId = (await _methodChannel.invokeMethod<String>(
         'connectRfcomm', device.toMap()))!;
     final input = StreamController<Uint8List>();
