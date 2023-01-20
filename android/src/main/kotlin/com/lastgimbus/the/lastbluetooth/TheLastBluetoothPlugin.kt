@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.util.*
 
 
@@ -30,6 +31,8 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     companion object {
         const val TAG = "TheLastBluetoothPlugin"
         const val PLUGIN_NAMESPACE = "the_last_bluetooth"
+
+        fun socketId(dev: BluetoothDevice, serviceUUID: UUID) = "$PLUGIN_NAMESPACE/rfcomm/${dev.address}/$serviceUUID"
     }
 
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -111,33 +114,47 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     @Shit
     @SuppressLint("MissingPermission")
     private fun connectRfcomm(dev: BluetoothDevice, serviceUUID: UUID): String {
-        val socketId = "$PLUGIN_NAMESPACE/rfcomm/${dev.address}/${serviceUUID}"
-        if (rfcommSocketMap.containsKey(socketId)) {
+        val id = socketId(dev, serviceUUID)
+        if (rfcommSocketMap.containsKey(id)) {
             Log.w(TAG, "Already connected to device")
-            return socketId
+            return id
         }
-        rfcommSocketMap[socketId] = dev.createRfcommSocketToServiceRecord(serviceUUID)
+        rfcommSocketMap[id] = dev.createRfcommSocketToServiceRecord(serviceUUID)
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                rfcommSocketMap[socketId]!!.connect()
+                rfcommSocketMap[id]!!.connect()
                 Log.i(TAG, "Connected to ${dev.name}")
                 while (true) {
                     // read 1024 bytes of data:
                     val buffer = ByteArray(1024)
-                    val read = rfcommSocketMap[socketId]!!.inputStream.read(buffer)
-                    val finalBytes = buffer.copyOfRange(0, read)
-                    // send to eventsink on ui thread:
-                    withContext(Dispatchers.Main) {
-                        eventSinkRfcomm?.success(
-                            hashMapOf(
-                                "socketId" to socketId, "data" to finalBytes
-                            )
-                        )
+                    var read = -10
+                    var closed = false
+                    try {
+                        if (rfcommSocketMap.containsKey(id)) {
+                            read = rfcommSocketMap[id]!!.inputStream.read(buffer)
+                        }
+                        if (read < 0) closed = true
+                    } catch (e: IOException) {
+                        closed = true
                     }
+                    withContext(Dispatchers.Main) {
+                        if (closed) {
+                            eventSinkRfcomm?.success(hashMapOf("socketId" to id, "closed" to true))
+                            rfcommSocketMap.remove(id)
+                        } else {
+                            // send to eventsink on ui thread:
+                            eventSinkRfcomm?.success(
+                                hashMapOf(
+                                    "socketId" to id, "data" to buffer.copyOfRange(0, read)
+                                )
+                            )
+                        }
+                    }
+                    if (closed) break
                 }
             }
         }
-        return socketId
+        return id
     }
 
     // ##### FlutterPlugin stuff #####
@@ -220,7 +237,19 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             }
 
             @Shit "rfcommWrite" -> {
-                rfcommSocketMap[call.argument<String>("socketId")!!]!!.outputStream.write(call.argument<ByteArray>("data")!!)
+                val id = call.argument<String>("socketId")!!
+                val sock = rfcommSocketMap[id]
+                if (sock != null && sock.isConnected) {
+                    GlobalScope.launch {
+                        withContext(Dispatchers.IO) {
+                            // this is a blocking function
+                            sock.outputStream.write(call.argument<ByteArray>("data")!!)
+                            withContext(Dispatchers.Main) {
+                                result.success(true)
+                            }
+                        }
+                    }
+                }
             }
 
             else -> result.notImplemented()

@@ -47,9 +47,16 @@ class TheLastBluetooth {
     _ecRfcomm.receiveBroadcastStream().listen((event) {
       print("Rfcomm from android: $event");
       final String socketId = event['socketId'];
-      _rfcommChannels.containsKey(socketId)
-          ? _rfcommChannels[socketId]!.add(event['data'])
-          : print("No channel for socketId $socketId!");
+      if (_rfcommChannels.containsKey(socketId)) {
+        if (event['closed'] == true) {
+          _rfcommChannels[socketId]!.close();
+          _rfcommChannels.remove(socketId);
+        } else {
+          _rfcommChannels[socketId]!.add(event['data']);
+        }
+      } else {
+        print("No channel for socketId $socketId!");
+      }
     });
   }
 

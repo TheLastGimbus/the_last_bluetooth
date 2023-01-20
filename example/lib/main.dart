@@ -87,7 +87,9 @@ class _MyAppState extends State<MyApp> {
                   try {
                     conn = await bt.connectRfcomm(
                         devices.firstWhere((e) => e.isConnected));
-                    conn!.io.stream.listen(print);
+                    setState(() {});
+                    await conn!.io.stream.listen(print).asFuture();
+                    conn = null;
                     setState(() {});
                   } catch (e) {
                     print(e);
