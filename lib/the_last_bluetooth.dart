@@ -49,6 +49,9 @@ class TheLastBluetooth {
       final String socketId = event['socketId'];
       if (_rfcommChannels.containsKey(socketId)) {
         if (event['closed'] == true) {
+          // From StreamChannel doc:
+          // /// Users should consider the [stream] emitting a "done" event to
+          // /// be the canonical indicator that the channel has closed
           _rfcommChannels[socketId]!.close();
           _rfcommChannels.remove(socketId);
         } else {
@@ -103,11 +106,17 @@ class TheLastBluetooth {
         'connectRfcomm', {...device.toMap(), 'uuid': serviceUUID}))!;
     final input = StreamController<Uint8List>();
     final output = StreamController<Uint8List>();
-    output.stream.listen((event) {
-      print("rfcomm write from flutter: $socketId: $event");
-      _methodChannel
-          .invokeMethod("rfcommWrite", {"socketId": socketId, "data": event});
-    });
+    output.stream.listen(
+      (event) {
+        print("rfcomm write from flutter: $socketId: $event");
+        _methodChannel
+            .invokeMethod("rfcommWrite", {"socketId": socketId, "data": event});
+      },
+      // From StreamChannel doc:
+      // /// If they wish to close the channel, they should close the [sink]
+      onDone: () =>
+          _methodChannel.invokeMethod("closeRfcomm", {"socketId": socketId}),
+    );
     _rfcommChannels[socketId] = input.sink;
     return BluetoothConnection(
         StreamChannel.withGuarantees(input.stream, output.sink));

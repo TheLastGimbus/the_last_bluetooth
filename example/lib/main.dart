@@ -100,6 +100,15 @@ class _MyAppState extends State<MyApp> {
               ),
               if (conn != null)
                 TextButton(
+                  onPressed: () async {
+                    await conn!.io.sink.close();
+                    conn = null;
+                    setState(() {});
+                  },
+                  child: Text("close"),
+                ),
+              if (conn != null)
+                TextButton(
                   onPressed: () {
                     conn!.io.sink.add(Uint8List.fromList(
                         [90, 0, 7, 0, 43, 4, 1, 2, 1, -1, -1, -20]));

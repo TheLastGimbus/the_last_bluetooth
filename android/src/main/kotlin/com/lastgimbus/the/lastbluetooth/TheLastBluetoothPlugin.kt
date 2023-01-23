@@ -160,6 +160,14 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         return successId
     }
 
+    private suspend fun closeRfcomm(id: String) {
+        withContext(Dispatchers.IO) {
+            if (!rfcommSocketMap.containsKey(id)) Log.w(TAG, "Socket $id already disconnected")
+            rfcommSocketMap[id]?.close()
+            rfcommSocketMap.remove(id)
+        }
+    }
+
     // ##### FlutterPlugin stuff #####
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         val context: Context = flutterPluginBinding.applicationContext
@@ -243,6 +251,14 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
                         if (id == null) result.error("connect_failed", "failed to connect to device", null)
                         else result.success(id)
                     }
+                }
+            }
+
+            "closeRfcomm" -> {
+                val id = call.argument<String>("socketId")!!
+                scope.launch {
+                    closeRfcomm(id)
+                    withContext(Dispatchers.Main) { result.success(null) }
                 }
             }
 
