@@ -42,7 +42,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     private var eventSinkAdapterInfo: EventChannel.EventSink? = null
     private var eventSinkPairedDevices: EventChannel.EventSink? = null
 
-    @Shit
     private var eventSinkRfcomm: EventChannel.EventSink? = null
     private val rfcommSocketMap = mutableMapOf<String, BluetoothSocket>()
 
@@ -107,7 +106,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         hashMapOf("name" to it.name, "alias" to alias, "address" to it.address, "isConnected" to it.isConnected)
     }
 
-    @Shit
     @SuppressLint("MissingPermission")
     private suspend fun connectRfcomm(dev: BluetoothDevice, serviceUUID: UUID): String? {
         val id = socketId(dev, serviceUUID)
@@ -204,8 +202,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
                 }
             })
         }
-
-        @Shit EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/rfcomm").apply {
+        EventChannel(flutterPluginBinding.binaryMessenger, "$PLUGIN_NAMESPACE/rfcomm").apply {
             setStreamHandler(object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                     eventSinkRfcomm = events
@@ -274,9 +271,7 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
                             } catch (e: IOException) {
                                 withContext(Dispatchers.Main) {
                                     result.error(
-                                        "write_failed",
-                                        "failed to write to socket",
-                                        e.toString()
+                                        "write_failed", "failed to write to socket", e.toString()
                                     )
                                 }
                             }
