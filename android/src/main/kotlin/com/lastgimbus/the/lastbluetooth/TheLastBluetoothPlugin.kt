@@ -262,16 +262,28 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
 
-            @Shit "rfcommWrite" -> {
+            "rfcommWrite" -> {
                 val id = call.argument<String>("socketId")!!
                 val sock = rfcommSocketMap[id]
                 if (sock != null && sock.isConnected) {
                     scope.launch {
-                        sock.outputStream.write(call.argument<ByteArray>("data")!!)
-                        withContext(Dispatchers.Main) {
-                            result.success(true)
+                        withContext(Dispatchers.IO) {
+                            try {
+                                sock.outputStream.write(call.argument<ByteArray>("data")!!)
+                                withContext(Dispatchers.Main) { result.success(true) }
+                            } catch (e: IOException) {
+                                withContext(Dispatchers.Main) {
+                                    result.error(
+                                        "write_failed",
+                                        "failed to write to socket",
+                                        e.toString()
+                                    )
+                                }
+                            }
                         }
                     }
+                } else {
+                    result.error("socket_not_connected", "socket is not connected", null)
                 }
             }
 
