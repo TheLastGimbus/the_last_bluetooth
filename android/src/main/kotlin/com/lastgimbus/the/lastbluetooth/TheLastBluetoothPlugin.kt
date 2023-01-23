@@ -49,9 +49,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
     private var bluetoothAdapter: BluetoothAdapter? = null
 
-    @Shit
-    private val bluetoothUuidSpp = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-
     private val broadcastReceiverAdapterInfo = object : BroadcastReceiver() {
         val listenedBroadcasts = listOf(
             BluetoothAdapter.ACTION_STATE_CHANGED,
@@ -232,8 +229,9 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             "getPairedDevices" -> result.success(getPairedDevices())
             @Shit "connectRfcomm" -> {
                 val address = call.argument<String>("address")!!
+                val uuid = UUID.fromString(call.argument<String>("uuid")!!)
                 val dev = bluetoothAdapter!!.getRemoteDevice(address)
-                result.success(connectRfcomm(dev, bluetoothUuidSpp))
+                result.success(connectRfcomm(dev, uuid))
             }
 
             @Shit "rfcommWrite" -> {

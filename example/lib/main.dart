@@ -16,6 +16,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final bt = TheLastBluetooth.instance;
+  static const sppUuid = "00001101-0000-1000-8000-00805f9b34fb";
 
   // Fallen into my own trap of "only first listen gets initial devices"
   List<BluetoothDevice> devices = [];
@@ -86,7 +87,7 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () async {
                   try {
                     conn = await bt.connectRfcomm(
-                        devices.firstWhere((e) => e.isConnected));
+                        devices.firstWhere((e) => e.isConnected), sppUuid);
                     setState(() {});
                     await conn!.io.stream.listen(print).asFuture();
                     conn = null;
