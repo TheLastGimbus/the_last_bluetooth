@@ -109,46 +109,55 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
     @Shit
     @SuppressLint("MissingPermission")
-    private fun connectRfcomm(dev: BluetoothDevice, serviceUUID: UUID): String {
+    private suspend fun connectRfcomm(dev: BluetoothDevice, serviceUUID: UUID): String? {
         val id = socketId(dev, serviceUUID)
         if (rfcommSocketMap.containsKey(id)) {
             Log.w(TAG, "Already connected to device")
             return id
         }
-        scope.launch {
-            rfcommSocketMap[id] = dev.createRfcommSocketToServiceRecord(serviceUUID)
-            rfcommSocketMap[id]!!.connect()
-            Log.i(TAG, "Connected to ${dev.name}")
-            while (true) {
-                // read 1024 bytes of data:
-                val buffer = ByteArray(1024)
-                var read = -10
-                var closed = false
-                try {
-                    if (rfcommSocketMap.containsKey(id)) {
-                        read = rfcommSocketMap[id]!!.inputStream.read(buffer)
-                    }
-                    if (read < 0) closed = true
-                } catch (e: IOException) {
-                    closed = true
-                }
-                withContext(Dispatchers.Main) {
-                    if (closed) {
-                        eventSinkRfcomm?.success(hashMapOf("socketId" to id, "closed" to true))
-                        rfcommSocketMap.remove(id)
-                    } else {
-                        // send to eventsink on ui thread:
-                        eventSinkRfcomm?.success(
-                            hashMapOf(
-                                "socketId" to id, "data" to buffer.copyOfRange(0, read)
-                            )
-                        )
-                    }
-                }
-                if (closed) break
+        val successId = withContext(Dispatchers.IO) {
+            try {
+                val socket = dev.createRfcommSocketToServiceRecord(serviceUUID)
+                socket.connect()
+                rfcommSocketMap[id] = socket // this will exec only if .connect() is success
+                return@withContext id
+            } catch (e: IOException) {
+                return@withContext null
             }
         }
-        return id
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                while (true) {
+                    // read 1024 bytes of data:
+                    val buffer = ByteArray(1024)
+                    var read = -10
+                    var closed = false
+                    try {
+                        if (rfcommSocketMap.containsKey(id)) {
+                            read = rfcommSocketMap[id]!!.inputStream.read(buffer)
+                        }
+                        if (read < 0) closed = true
+                    } catch (e: IOException) {
+                        closed = true
+                    }
+                    withContext(Dispatchers.Main) {
+                        if (closed) {
+                            rfcommSocketMap.remove(id)
+                            eventSinkRfcomm?.success(hashMapOf("socketId" to id, "closed" to true))
+                        } else {
+                            // send to eventsink on ui thread:
+                            eventSinkRfcomm?.success(
+                                hashMapOf(
+                                    "socketId" to id, "data" to buffer.copyOfRange(0, read)
+                                )
+                            )
+                        }
+                    }
+                    if (closed) break
+                }
+            }
+        }
+        return successId
     }
 
     // ##### FlutterPlugin stuff #####
@@ -231,7 +240,8 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
                 scope.launch {
                     val id = connectRfcomm(dev, uuid)
                     withContext(Dispatchers.Main) {
-                        result.success(id)
+                        if (id == null) result.error("connect_failed", "failed to connect to device", null)
+                        else result.success(id)
                     }
                 }
             }
