@@ -18,10 +18,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.util.*
 
@@ -34,6 +31,8 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
         fun socketId(dev: BluetoothDevice, serviceUUID: UUID) = "$PLUGIN_NAMESPACE/rfcomm/${dev.address}/$serviceUUID"
     }
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
@@ -116,39 +115,37 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             Log.w(TAG, "Already connected to device")
             return id
         }
-        rfcommSocketMap[id] = dev.createRfcommSocketToServiceRecord(serviceUUID)
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                rfcommSocketMap[id]!!.connect()
-                Log.i(TAG, "Connected to ${dev.name}")
-                while (true) {
-                    // read 1024 bytes of data:
-                    val buffer = ByteArray(1024)
-                    var read = -10
-                    var closed = false
-                    try {
-                        if (rfcommSocketMap.containsKey(id)) {
-                            read = rfcommSocketMap[id]!!.inputStream.read(buffer)
-                        }
-                        if (read < 0) closed = true
-                    } catch (e: IOException) {
-                        closed = true
+        scope.launch {
+            rfcommSocketMap[id] = dev.createRfcommSocketToServiceRecord(serviceUUID)
+            rfcommSocketMap[id]!!.connect()
+            Log.i(TAG, "Connected to ${dev.name}")
+            while (true) {
+                // read 1024 bytes of data:
+                val buffer = ByteArray(1024)
+                var read = -10
+                var closed = false
+                try {
+                    if (rfcommSocketMap.containsKey(id)) {
+                        read = rfcommSocketMap[id]!!.inputStream.read(buffer)
                     }
-                    withContext(Dispatchers.Main) {
-                        if (closed) {
-                            eventSinkRfcomm?.success(hashMapOf("socketId" to id, "closed" to true))
-                            rfcommSocketMap.remove(id)
-                        } else {
-                            // send to eventsink on ui thread:
-                            eventSinkRfcomm?.success(
-                                hashMapOf(
-                                    "socketId" to id, "data" to buffer.copyOfRange(0, read)
-                                )
-                            )
-                        }
-                    }
-                    if (closed) break
+                    if (read < 0) closed = true
+                } catch (e: IOException) {
+                    closed = true
                 }
+                withContext(Dispatchers.Main) {
+                    if (closed) {
+                        eventSinkRfcomm?.success(hashMapOf("socketId" to id, "closed" to true))
+                        rfcommSocketMap.remove(id)
+                    } else {
+                        // send to eventsink on ui thread:
+                        eventSinkRfcomm?.success(
+                            hashMapOf(
+                                "socketId" to id, "data" to buffer.copyOfRange(0, read)
+                            )
+                        )
+                    }
+                }
+                if (closed) break
             }
         }
         return id
@@ -227,24 +224,26 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
             "isEnabled" -> result.success(bluetoothAdapter!!.isEnabled)
             "getName" -> result.success(bluetoothAdapter!!.name)
             "getPairedDevices" -> result.success(getPairedDevices())
-            @Shit "connectRfcomm" -> {
+            "connectRfcomm" -> {
                 val address = call.argument<String>("address")!!
                 val uuid = UUID.fromString(call.argument<String>("uuid")!!)
                 val dev = bluetoothAdapter!!.getRemoteDevice(address)
-                result.success(connectRfcomm(dev, uuid))
+                scope.launch {
+                    val id = connectRfcomm(dev, uuid)
+                    withContext(Dispatchers.Main) {
+                        result.success(id)
+                    }
+                }
             }
 
             @Shit "rfcommWrite" -> {
                 val id = call.argument<String>("socketId")!!
                 val sock = rfcommSocketMap[id]
                 if (sock != null && sock.isConnected) {
-                    GlobalScope.launch {
-                        withContext(Dispatchers.IO) {
-                            // this is a blocking function
-                            sock.outputStream.write(call.argument<ByteArray>("data")!!)
-                            withContext(Dispatchers.Main) {
-                                result.success(true)
-                            }
+                    scope.launch {
+                        sock.outputStream.write(call.argument<ByteArray>("data")!!)
+                        withContext(Dispatchers.Main) {
+                            result.success(true)
                         }
                     }
                 }
@@ -252,5 +251,6 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
 
             else -> result.notImplemented()
         }
+
     }
 }
