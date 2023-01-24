@@ -118,7 +118,9 @@ class TheLastBluetooth {
           _methodChannel.invokeMethod("closeRfcomm", {"socketId": socketId}),
     );
     _rfcommChannels[socketId] = input.sink;
-    return BluetoothConnection(
-        StreamChannel.withGuarantees(input.stream, output.sink));
+    // Using this .withGuarantees() breaks the .broadcast :(
+    // So i guess we can omit it since we nicely close in
+    // _ecRfcomm.receiveBroadcastStream().listen(...)
+    return BluetoothConnection(StreamChannel(input.stream, output.sink));
   }
 }
