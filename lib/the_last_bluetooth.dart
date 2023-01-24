@@ -104,7 +104,7 @@ class TheLastBluetooth {
       BluetoothDevice device, String serviceUUID) async {
     final socketId = (await _methodChannel.invokeMethod<String>(
         'connectRfcomm', {...device.toMap(), 'uuid': serviceUUID}))!;
-    final input = StreamController<Uint8List>();
+    final input = StreamController<Uint8List>.broadcast();
     final output = StreamController<Uint8List>();
     output.stream.listen(
       (event) {
