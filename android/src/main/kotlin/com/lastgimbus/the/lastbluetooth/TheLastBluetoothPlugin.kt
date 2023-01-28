@@ -116,10 +116,11 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
         val successId = withContext(Dispatchers.IO) {
             try {
                 val socket = dev.createRfcommSocketToServiceRecord(serviceUUID)
-                socket.connect()
+                if (!socket.isConnected) socket.connect()
                 rfcommSocketMap[id] = socket // this will exec only if .connect() is success
                 return@withContext id
             } catch (e: IOException) {
+                Log.e(TAG, "Error while connecting to device", e)
                 return@withContext null
             }
         }
