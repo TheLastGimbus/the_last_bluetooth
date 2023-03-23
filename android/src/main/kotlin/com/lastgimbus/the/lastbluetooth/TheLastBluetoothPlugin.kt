@@ -17,7 +17,6 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.*
 import java.io.IOException
 import java.util.*
@@ -228,7 +227,8 @@ class TheLastBluetoothPlugin : FlutterPlugin, MethodCallHandler {
     // ##### MethodCallHandler stuff #####
     @SuppressLint("MissingPermission")
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        Log.d(TAG, "Method call: $call")
+        // TODO: More elegant logs
+//        Log.d(TAG, "Method call: $call")
         if (bluetoothAdapter == null) {
             if (call.method == "isAvailable") result.success(false)
             else result.error("bluetooth_unavailable", "bluetooth is not available", null)

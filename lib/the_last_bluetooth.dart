@@ -45,7 +45,8 @@ class TheLastBluetooth {
 
     // @Shit()
     _ecRfcomm.receiveBroadcastStream().listen((event) {
-      print("Rfcomm from android: $event");
+      // TODO: Some more elegant logs
+      // print("Rfcomm from android: $event");
       final String socketId = event['socketId'];
       if (_rfcommChannels.containsKey(socketId)) {
         if (event['closed'] == true) {
@@ -108,7 +109,7 @@ class TheLastBluetooth {
     final output = StreamController<Uint8List>();
     output.stream.listen(
       (event) {
-        print("rfcomm write from flutter: $socketId: $event");
+        // print("rfcomm write from flutter: $socketId: $event");
         _methodChannel
             .invokeMethod("rfcommWrite", {"socketId": socketId, "data": event});
       },
