@@ -11,6 +11,9 @@ output:
     path: lib/src/android_bluetooth.g.dart
     structure: single_file
 
+#enable_experiment:
+#  - interface_implementation
+
 classes:
   - 'android.bluetooth.BluetoothAdapter'
   - 'android.bluetooth.BluetoothDevice'
