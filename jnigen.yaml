@@ -1,0 +1,22 @@
+android_sdk_config:
+  add_gradle_deps: true
+  add_gradle_sources: true
+  android_example: 'example/'
+
+output:
+  c:
+    library_name: the_last_bluetooth
+    path: c_src/jnigen/
+  dart:
+    path: lib/src/android_bluetooth.g.dart
+    structure: single_file
+
+classes:
+  - 'android.bluetooth.BluetoothAdapter'
+  - 'android.bluetooth.BluetoothDevice'
+  - 'android.bluetooth.BluetoothManager'
+  - 'android.bluetooth.BluetoothSocket'
+  - 'android.content.BroadcastReceiver'
+  - 'android.content.Context'
+  - 'android.content.Intent'
+  - 'android.content.IntentFilter'
