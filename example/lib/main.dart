@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:the_last_bluetooth/the_last_bluetooth.dart' as the_last_bluetooth;
+import 'package:the_last_bluetooth/the_last_bluetooth.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,55 +13,40 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late int sumResult;
-  late Future<int> sumAsyncResult;
+  final bt = TheLastBluetooth.instance;
 
   @override
   void initState() {
     super.initState();
-    sumResult = the_last_bluetooth.sum(1, 2);
-    sumAsyncResult = the_last_bluetooth.sumAsync(3, 4);
   }
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontSize: 25);
-    const spacerSmall = SizedBox(height: 10);
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Native Packages'),
+          title: StreamBuilder(
+            stream: bt.isEnabled,
+            builder: (_, snap) => Text(
+                "Bluetooth ${snap.hasData ? (snap.data! ? 'enabled ✅' : 'disabled ❌') : 'null'}"),
+          ),
         ),
         body: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  'This calls a native function through FFI that is shipped as source in the package. '
-                  'The native code is built as part of the Flutter Runner build.',
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                ),
-                spacerSmall,
-                Text(
-                  'sum(1, 2) = $sumResult',
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                ),
-                spacerSmall,
-                FutureBuilder<int>(
-                  future: sumAsyncResult,
-                  builder: (BuildContext context, AsyncSnapshot<int> value) {
-                    final displayValue =
-                        (value.hasData) ? value.data : 'loading';
-                    return Text(
-                      'await sumAsync(3, 4) = $displayValue',
-                      style: textStyle,
-                      textAlign: TextAlign.center,
-                    );
-                  },
-                ),
+                StreamBuilder(
+                  stream: bt.pairedDevices,
+                  builder: (_, snap) => Column(
+                    children: [
+                      if (snap.hasData)
+                        for (final dev in snap.data!)
+                          Text(dev.name.valueOrNull ?? 'null'),
+                    ],
+                  ),
+                )
               ],
             ),
           ),

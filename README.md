@@ -1,92 +1,29 @@
 # the_last_bluetooth
 
-A new Flutter FFI plugin project.
+This is my own internal library for FreeBuddy app. Things may seem biased, and may change chaotically in future
 
-## Getting Started
+However, I owe myself rights to pretend like it's seriously planned for future and all design decisions are thought-through
 
-This project is a starting point for a Flutter
-[FFI plugin](https://docs.flutter.dev/development/platform-integration/c-interop),
-a specialized package that includes native code directly invoked with Dart FFI.
+Cheers!
 
-## Project structure
+# Organization of this library:
 
-This template uses the following structure:
+## Flutter/Stream-like organization
+Everything is done as much "Flutter-way" as possible, while heavily using Futures/Streams
 
-* `src`: Contains the native source code, and a CmakeFile.txt file for building
-  that source code into a dynamic library.
+Every value that can anyhow change in future is a Stream - more precisely, a `ValueStream` from `rxdart` library
 
-* `lib`: Contains the Dart code that defines the API of the plugin, and which
-  calls into the native code using `dart:ffi`.
+I know that bringing yet another dependency may seem messy - however, `rxdart` is just based as fuck
 
-* platform folders (`android`, `ios`, `windows`, etc.): Contains the build files
-  for building and bundling the native code library with the platform application.
+![Gigachad](https://web.archive.org/web/20230825195048if_/https://i.imgur.com/EW1wCI4.png)
 
-## Building and bundling native code
+### Everything is a stream*
+*almost
 
-The `pubspec.yaml` specifies FFI plugins as follows:
+Yes. Because even availability of bluetooth may change (you can plug a usb card in and out 👀)
 
-```yaml
-  plugin:
-    platforms:
-      some_platform:
-        ffiPlugin: true
-```
+And #1 thing I hate when UI apps don't react to what's happening, and you need to refresh/reopen stuff
 
-This configuration invokes the native build for the various target platforms
-and bundles the binaries in Flutter applications using these FFI plugins.
+## As few boilerplates/reduntant helpers as possible
 
-This can be combined with dartPluginClass, such as when FFI is used for the
-implementation of one platform in a federated plugin:
-
-```yaml
-  plugin:
-    implements: some_other_plugin
-    platforms:
-      some_platform:
-        dartPluginClass: SomeClass
-        ffiPlugin: true
-```
-
-A plugin can have both FFI and method channels:
-
-```yaml
-  plugin:
-    platforms:
-      some_platform:
-        pluginClass: SomeName
-        ffiPlugin: true
-```
-
-The native build systems that are invoked by FFI (and method channel) plugins are:
-
-* For Android: Gradle, which invokes the Android NDK for native builds.
-  * See the documentation in android/build.gradle.
-* For iOS and MacOS: Xcode, via CocoaPods.
-  * See the documentation in ios/the_last_bluetooth.podspec.
-  * See the documentation in macos/the_last_bluetooth.podspec.
-* For Linux and Windows: CMake.
-  * See the documentation in linux/CMakeLists.txt.
-  * See the documentation in windows/CMakeLists.txt.
-
-## Binding to native code
-
-To use the native code, bindings in Dart are needed.
-To avoid writing these by hand, they are generated from the header file
-(`src/the_last_bluetooth.h`) by `package:ffigen`.
-Regenerate the bindings by running `flutter pub run ffigen --config ffigen.yaml`.
-
-## Invoking native code
-
-Very short-running native functions can be directly invoked from any isolate.
-For example, see `sum` in `lib/the_last_bluetooth.dart`.
-
-Longer-running functions should be invoked on a helper isolate to avoid
-dropping frames in Flutter applications.
-For example, see `sumAsync` in `lib/the_last_bluetooth.dart`.
-
-## Flutter help
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+Example: 
