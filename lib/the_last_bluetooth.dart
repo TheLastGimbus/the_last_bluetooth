@@ -42,7 +42,7 @@ class TheLastBluetooth {
             name: android.BluetoothAdapter.ACTION_STATE_CHANGED,
             data: {
               android.BluetoothAdapter.EXTRA_STATE: int state,
-              android.BluetoothAdapter.EXTRA_PREVIOUS_STATE: int prevState,
+              android.BluetoothAdapter.EXTRA_PREVIOUS_STATE: int _,
             },
           ):
           switch (state) {
