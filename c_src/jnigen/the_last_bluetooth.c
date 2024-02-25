@@ -1586,6 +1586,23 @@ JniResult BluetoothSocket__getConnectionType(jobject self_) {
   return (JniResult){.value = {.i = _result}, .exception = check_exception()};
 }
 
+jmethodID _m_BluetoothSocket__toString1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult BluetoothSocket__toString1(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_BluetoothSocket,
+                        "android/bluetooth/BluetoothSocket");
+  if (_c_BluetoothSocket == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_BluetoothSocket, &_m_BluetoothSocket__toString1, "toString",
+              "()Ljava/lang/String;");
+  if (_m_BluetoothSocket__toString1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->CallObjectMethod(jniEnv, self_, _m_BluetoothSocket__toString1);
+  return to_global_ref_result(_result);
+}
+
 // android.content.BroadcastReceiver$PendingResult
 jclass _c_BroadcastReceiver_PendingResult = NULL;
 
@@ -2098,6 +2115,40 @@ JniResult BroadcastReceiver__setOrderedHint(jobject self_, uint8_t z) {
   return (JniResult){.value = {.j = 0}, .exception = check_exception()};
 }
 
+jmethodID _m_BroadcastReceiver__getSentFromUid = NULL;
+FFI_PLUGIN_EXPORT
+JniResult BroadcastReceiver__getSentFromUid(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_BroadcastReceiver,
+                        "android/content/BroadcastReceiver");
+  if (_c_BroadcastReceiver == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_BroadcastReceiver, &_m_BroadcastReceiver__getSentFromUid,
+              "getSentFromUid", "()I");
+  if (_m_BroadcastReceiver__getSentFromUid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result = (*jniEnv)->CallIntMethod(
+      jniEnv, self_, _m_BroadcastReceiver__getSentFromUid);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_BroadcastReceiver__getSentFromPackage = NULL;
+FFI_PLUGIN_EXPORT
+JniResult BroadcastReceiver__getSentFromPackage(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_BroadcastReceiver,
+                        "android/content/BroadcastReceiver");
+  if (_c_BroadcastReceiver == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_BroadcastReceiver, &_m_BroadcastReceiver__getSentFromPackage,
+              "getSentFromPackage", "()Ljava/lang/String;");
+  if (_m_BroadcastReceiver__getSentFromPackage == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallObjectMethod(
+      jniEnv, self_, _m_BroadcastReceiver__getSentFromPackage);
+  return to_global_ref_result(_result);
+}
+
 jmethodID _m_BroadcastReceiver__setDebugUnregister = NULL;
 FFI_PLUGIN_EXPORT
 JniResult BroadcastReceiver__setDebugUnregister(jobject self_, uint8_t z) {
@@ -2130,6 +2181,27 @@ JniResult BroadcastReceiver__getDebugUnregister(jobject self_) {
   uint8_t _result = (*jniEnv)->CallBooleanMethod(
       jniEnv, self_, _m_BroadcastReceiver__getDebugUnregister);
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+// android.content.Context$BindServiceFlags
+jclass _c_Context_BindServiceFlags = NULL;
+
+jmethodID _m_Context_BindServiceFlags__of = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context_BindServiceFlags__of(int64_t j) {
+  load_env();
+  load_class_global_ref(&_c_Context_BindServiceFlags,
+                        "android/content/Context$BindServiceFlags");
+  if (_c_Context_BindServiceFlags == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_Context_BindServiceFlags,
+                     &_m_Context_BindServiceFlags__of, "of",
+                     "(J)Landroid/content/Context$BindServiceFlags;");
+  if (_m_Context_BindServiceFlags__of == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallStaticObjectMethod(
+      jniEnv, _c_Context_BindServiceFlags, _m_Context_BindServiceFlags__of, j);
+  return to_global_ref_result(_result);
 }
 
 // android.content.Context
@@ -3373,6 +3445,26 @@ JniResult Context__sendBroadcastWithMultiplePermissions(jobject self_,
   return (JniResult){.value = {.j = 0}, .exception = check_exception()};
 }
 
+jmethodID _m_Context__sendBroadcast2 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__sendBroadcast2(jobject self_,
+                                  jobject intent,
+                                  jobject string,
+                                  jobject bundle) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(
+      _c_Context, &_m_Context__sendBroadcast2, "sendBroadcast",
+      "(Landroid/content/Intent;Ljava/lang/String;Landroid/os/Bundle;)V");
+  if (_m_Context__sendBroadcast2 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_Context__sendBroadcast2, intent,
+                            string, bundle);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
 jmethodID _m_Context__sendOrderedBroadcast = NULL;
 FFI_PLUGIN_EXPORT
 JniResult Context__sendOrderedBroadcast(jobject self_,
@@ -3397,6 +3489,26 @@ FFI_PLUGIN_EXPORT
 JniResult Context__sendOrderedBroadcast1(jobject self_,
                                          jobject intent,
                                          jobject string,
+                                         jobject bundle) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(
+      _c_Context, &_m_Context__sendOrderedBroadcast1, "sendOrderedBroadcast",
+      "(Landroid/content/Intent;Ljava/lang/String;Landroid/os/Bundle;)V");
+  if (_m_Context__sendOrderedBroadcast1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_Context__sendOrderedBroadcast1,
+                            intent, string, bundle);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_Context__sendOrderedBroadcast2 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__sendOrderedBroadcast2(jobject self_,
+                                         jobject intent,
+                                         jobject string,
                                          jobject broadcastReceiver,
                                          jobject handler,
                                          int32_t i,
@@ -3406,16 +3518,44 @@ JniResult Context__sendOrderedBroadcast1(jobject self_,
   load_class_global_ref(&_c_Context, "android/content/Context");
   if (_c_Context == NULL)
     return (JniResult){.value = {.j = 0}, .exception = check_exception()};
-  load_method(_c_Context, &_m_Context__sendOrderedBroadcast1,
+  load_method(_c_Context, &_m_Context__sendOrderedBroadcast2,
               "sendOrderedBroadcast",
               "(Landroid/content/Intent;Ljava/lang/String;Landroid/content/"
               "BroadcastReceiver;Landroid/os/Handler;ILjava/lang/"
               "String;Landroid/os/Bundle;)V");
-  if (_m_Context__sendOrderedBroadcast1 == NULL)
+  if (_m_Context__sendOrderedBroadcast2 == NULL)
     return (JniResult){.value = {.j = 0}, .exception = check_exception()};
-  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_Context__sendOrderedBroadcast1,
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_Context__sendOrderedBroadcast2,
                             intent, string, broadcastReceiver, handler, i,
                             string1, bundle);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_Context__sendOrderedBroadcast3 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__sendOrderedBroadcast3(jobject self_,
+                                         jobject intent,
+                                         jobject string,
+                                         jobject bundle,
+                                         jobject broadcastReceiver,
+                                         jobject handler,
+                                         int32_t i,
+                                         jobject string1,
+                                         jobject bundle1) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_Context, &_m_Context__sendOrderedBroadcast3,
+              "sendOrderedBroadcast",
+              "(Landroid/content/Intent;Ljava/lang/String;Landroid/os/"
+              "Bundle;Landroid/content/BroadcastReceiver;Landroid/os/"
+              "Handler;ILjava/lang/String;Landroid/os/Bundle;)V");
+  if (_m_Context__sendOrderedBroadcast3 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_Context__sendOrderedBroadcast3,
+                            intent, string, bundle, broadcastReceiver, handler,
+                            i, string1, bundle1);
   return (JniResult){.value = {.j = 0}, .exception = check_exception()};
 }
 
@@ -3486,9 +3626,9 @@ JniResult Context__sendOrderedBroadcastAsUser(jobject self_,
   return (JniResult){.value = {.j = 0}, .exception = check_exception()};
 }
 
-jmethodID _m_Context__sendOrderedBroadcast2 = NULL;
+jmethodID _m_Context__sendOrderedBroadcast4 = NULL;
 FFI_PLUGIN_EXPORT
-JniResult Context__sendOrderedBroadcast2(jobject self_,
+JniResult Context__sendOrderedBroadcast4(jobject self_,
                                          jobject intent,
                                          jobject string,
                                          jobject string1,
@@ -3501,14 +3641,14 @@ JniResult Context__sendOrderedBroadcast2(jobject self_,
   load_class_global_ref(&_c_Context, "android/content/Context");
   if (_c_Context == NULL)
     return (JniResult){.value = {.j = 0}, .exception = check_exception()};
-  load_method(_c_Context, &_m_Context__sendOrderedBroadcast2,
+  load_method(_c_Context, &_m_Context__sendOrderedBroadcast4,
               "sendOrderedBroadcast",
               "(Landroid/content/Intent;Ljava/lang/String;Ljava/lang/"
               "String;Landroid/content/BroadcastReceiver;Landroid/os/"
               "Handler;ILjava/lang/String;Landroid/os/Bundle;)V");
-  if (_m_Context__sendOrderedBroadcast2 == NULL)
+  if (_m_Context__sendOrderedBroadcast4 == NULL)
     return (JniResult){.value = {.j = 0}, .exception = check_exception()};
-  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_Context__sendOrderedBroadcast2,
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_Context__sendOrderedBroadcast4,
                             intent, string, string1, broadcastReceiver, handler,
                             i, string2, bundle);
   return (JniResult){.value = {.j = 0}, .exception = check_exception()};
@@ -3835,6 +3975,27 @@ jmethodID _m_Context__bindService1 = NULL;
 FFI_PLUGIN_EXPORT
 JniResult Context__bindService1(jobject self_,
                                 jobject intent,
+                                jobject serviceConnection,
+                                jobject bindServiceFlags) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_Context, &_m_Context__bindService1, "bindService",
+              "(Landroid/content/Intent;Landroid/content/"
+              "ServiceConnection;Landroid/content/Context$BindServiceFlags;)Z");
+  if (_m_Context__bindService1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result =
+      (*jniEnv)->CallBooleanMethod(jniEnv, self_, _m_Context__bindService1,
+                                   intent, serviceConnection, bindServiceFlags);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_Context__bindService2 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__bindService2(jobject self_,
+                                jobject intent,
                                 int32_t i,
                                 jobject executor,
                                 jobject serviceConnection) {
@@ -3842,14 +4003,37 @@ JniResult Context__bindService1(jobject self_,
   load_class_global_ref(&_c_Context, "android/content/Context");
   if (_c_Context == NULL)
     return (JniResult){.value = {.j = 0}, .exception = check_exception()};
-  load_method(_c_Context, &_m_Context__bindService1, "bindService",
+  load_method(_c_Context, &_m_Context__bindService2, "bindService",
               "(Landroid/content/Intent;ILjava/util/concurrent/"
               "Executor;Landroid/content/ServiceConnection;)Z");
-  if (_m_Context__bindService1 == NULL)
+  if (_m_Context__bindService2 == NULL)
     return (JniResult){.value = {.j = 0}, .exception = check_exception()};
   uint8_t _result =
-      (*jniEnv)->CallBooleanMethod(jniEnv, self_, _m_Context__bindService1,
+      (*jniEnv)->CallBooleanMethod(jniEnv, self_, _m_Context__bindService2,
                                    intent, i, executor, serviceConnection);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_Context__bindService3 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__bindService3(jobject self_,
+                                jobject intent,
+                                jobject bindServiceFlags,
+                                jobject executor,
+                                jobject serviceConnection) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_Context, &_m_Context__bindService3, "bindService",
+              "(Landroid/content/Intent;Landroid/content/"
+              "Context$BindServiceFlags;Ljava/util/concurrent/"
+              "Executor;Landroid/content/ServiceConnection;)Z");
+  if (_m_Context__bindService3 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result = (*jniEnv)->CallBooleanMethod(
+      jniEnv, self_, _m_Context__bindService3, intent, bindServiceFlags,
+      executor, serviceConnection);
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
 }
 
@@ -3877,6 +4061,31 @@ JniResult Context__bindIsolatedService(jobject self_,
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
 }
 
+jmethodID _m_Context__bindIsolatedService1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__bindIsolatedService1(jobject self_,
+                                        jobject intent,
+                                        jobject bindServiceFlags,
+                                        jobject string,
+                                        jobject executor,
+                                        jobject serviceConnection) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_Context, &_m_Context__bindIsolatedService1,
+              "bindIsolatedService",
+              "(Landroid/content/Intent;Landroid/content/"
+              "Context$BindServiceFlags;Ljava/lang/String;Ljava/util/"
+              "concurrent/Executor;Landroid/content/ServiceConnection;)Z");
+  if (_m_Context__bindIsolatedService1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result = (*jniEnv)->CallBooleanMethod(
+      jniEnv, self_, _m_Context__bindIsolatedService1, intent, bindServiceFlags,
+      string, executor, serviceConnection);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
 jmethodID _m_Context__bindServiceAsUser = NULL;
 FFI_PLUGIN_EXPORT
 JniResult Context__bindServiceAsUser(jobject self_,
@@ -3896,6 +4105,29 @@ JniResult Context__bindServiceAsUser(jobject self_,
   uint8_t _result =
       (*jniEnv)->CallBooleanMethod(jniEnv, self_, _m_Context__bindServiceAsUser,
                                    intent, serviceConnection, i, userHandle);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_Context__bindServiceAsUser1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__bindServiceAsUser1(jobject self_,
+                                      jobject intent,
+                                      jobject serviceConnection,
+                                      jobject bindServiceFlags,
+                                      jobject userHandle) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(
+      _c_Context, &_m_Context__bindServiceAsUser1, "bindServiceAsUser",
+      "(Landroid/content/Intent;Landroid/content/ServiceConnection;Landroid/"
+      "content/Context$BindServiceFlags;Landroid/os/UserHandle;)Z");
+  if (_m_Context__bindServiceAsUser1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result = (*jniEnv)->CallBooleanMethod(
+      jniEnv, self_, _m_Context__bindServiceAsUser1, intent, serviceConnection,
+      bindServiceFlags, userHandle);
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
 }
 
@@ -4512,6 +4744,22 @@ JniResult Context__createDisplayContext(jobject self_, jobject display) {
   return to_global_ref_result(_result);
 }
 
+jmethodID _m_Context__createDeviceContext = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__createDeviceContext(jobject self_, int32_t i) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_Context, &_m_Context__createDeviceContext,
+              "createDeviceContext", "(I)Landroid/content/Context;");
+  if (_m_Context__createDeviceContext == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallObjectMethod(
+      jniEnv, self_, _m_Context__createDeviceContext, i);
+  return to_global_ref_result(_result);
+}
+
 jmethodID _m_Context__createWindowContext = NULL;
 FFI_PLUGIN_EXPORT
 JniResult Context__createWindowContext(jobject self_,
@@ -4615,6 +4863,60 @@ JniResult Context__getDisplay(jobject self_) {
   jobject _result =
       (*jniEnv)->CallObjectMethod(jniEnv, self_, _m_Context__getDisplay);
   return to_global_ref_result(_result);
+}
+
+jmethodID _m_Context__getDeviceId = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__getDeviceId(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_Context, &_m_Context__getDeviceId, "getDeviceId", "()I");
+  if (_m_Context__getDeviceId == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_Context__getDeviceId);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_Context__registerDeviceIdChangeListener = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__registerDeviceIdChangeListener(jobject self_,
+                                                  jobject executor,
+                                                  jobject intConsumer) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(
+      _c_Context, &_m_Context__registerDeviceIdChangeListener,
+      "registerDeviceIdChangeListener",
+      "(Ljava/util/concurrent/Executor;Ljava/util/function/IntConsumer;)V");
+  if (_m_Context__registerDeviceIdChangeListener == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_,
+                            _m_Context__registerDeviceIdChangeListener,
+                            executor, intConsumer);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_Context__unregisterDeviceIdChangeListener = NULL;
+FFI_PLUGIN_EXPORT
+JniResult Context__unregisterDeviceIdChangeListener(jobject self_,
+                                                    jobject intConsumer) {
+  load_env();
+  load_class_global_ref(&_c_Context, "android/content/Context");
+  if (_c_Context == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_Context, &_m_Context__unregisterDeviceIdChangeListener,
+              "unregisterDeviceIdChangeListener",
+              "(Ljava/util/function/IntConsumer;)V");
+  if (_m_Context__unregisterDeviceIdChangeListener == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(
+      jniEnv, self_, _m_Context__unregisterDeviceIdChangeListener, intConsumer);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
 }
 
 jmethodID _m_Context__isRestricted = NULL;

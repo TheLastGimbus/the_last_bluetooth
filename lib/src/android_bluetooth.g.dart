@@ -58,6 +58,110 @@ class BluetoothAdapter_LeScanCallback extends jni.JObject {
     return _onLeScan(reference, bluetoothDevice.reference, i, bs.reference)
         .check();
   }
+
+  /// Maps a specific port to the implemented interface.
+  static final Map<int, $BluetoothAdapter_LeScanCallbackImpl> _$impls = {};
+  ReceivePort? _$p;
+
+  static jni.JObjectPtr _$invoke(
+    int port,
+    jni.JObjectPtr descriptor,
+    jni.JObjectPtr args,
+  ) {
+    return _$invokeMethod(
+      port,
+      $MethodInvocation.fromAddresses(
+        0,
+        descriptor.address,
+        args.address,
+      ),
+    );
+  }
+
+  static final ffi.Pointer<
+          ffi.NativeFunction<
+              jni.JObjectPtr Function(
+                  ffi.Uint64, jni.JObjectPtr, jni.JObjectPtr)>>
+      _$invokePointer = ffi.Pointer.fromFunction(_$invoke);
+
+  static ffi.Pointer<ffi.Void> _$invokeMethod(
+    int $p,
+    $MethodInvocation $i,
+  ) {
+    try {
+      final $d = $i.methodDescriptor.toDartString(releaseOriginal: true);
+      final $a = $i.args;
+      if ($d == r"onLeScan(Landroid/bluetooth/BluetoothDevice;I[B)V") {
+        _$impls[$p]!.onLeScan(
+          $a[0].castTo(const $BluetoothDeviceType(), releaseOriginal: true),
+          $a[1]
+              .castTo(const jni.JIntegerType(), releaseOriginal: true)
+              .intValue(releaseOriginal: true),
+          $a[2].castTo(const jni.JArrayType(jni.jbyteType()),
+              releaseOriginal: true),
+        );
+        return jni.nullptr;
+      }
+    } catch (e) {
+      return ProtectedJniExtensions.newDartException(e.toString());
+    }
+    return jni.nullptr;
+  }
+
+  factory BluetoothAdapter_LeScanCallback.implement(
+    $BluetoothAdapter_LeScanCallbackImpl $impl,
+  ) {
+    final $p = ReceivePort();
+    final $x = BluetoothAdapter_LeScanCallback.fromRef(
+      ProtectedJniExtensions.newPortProxy(
+        r"android.bluetooth.BluetoothAdapter$LeScanCallback",
+        $p,
+        _$invokePointer,
+      ),
+    ).._$p = $p;
+    final $a = $p.sendPort.nativePort;
+    _$impls[$a] = $impl;
+    $p.listen(($m) {
+      if ($m == null) {
+        _$impls.remove($p.sendPort.nativePort);
+        $p.close();
+        return;
+      }
+      final $i = $MethodInvocation.fromMessage($m as List<dynamic>);
+      final $r = _$invokeMethod($p.sendPort.nativePort, $i);
+      ProtectedJniExtensions.returnResult($i.result, $r);
+    });
+    return $x;
+  }
+}
+
+abstract class $BluetoothAdapter_LeScanCallbackImpl {
+  factory $BluetoothAdapter_LeScanCallbackImpl({
+    required void Function(
+            BluetoothDevice bluetoothDevice, int i, jni.JArray<jni.jbyte> bs)
+        onLeScan,
+  }) = _$BluetoothAdapter_LeScanCallbackImpl;
+
+  void onLeScan(
+      BluetoothDevice bluetoothDevice, int i, jni.JArray<jni.jbyte> bs);
+}
+
+class _$BluetoothAdapter_LeScanCallbackImpl
+    implements $BluetoothAdapter_LeScanCallbackImpl {
+  _$BluetoothAdapter_LeScanCallbackImpl({
+    required void Function(
+            BluetoothDevice bluetoothDevice, int i, jni.JArray<jni.jbyte> bs)
+        onLeScan,
+  }) : _onLeScan = onLeScan;
+
+  final void Function(
+          BluetoothDevice bluetoothDevice, int i, jni.JArray<jni.jbyte> bs)
+      _onLeScan;
+
+  void onLeScan(
+      BluetoothDevice bluetoothDevice, int i, jni.JArray<jni.jbyte> bs) {
+    return _onLeScan(bluetoothDevice, i, bs);
+  }
 }
 
 final class $BluetoothAdapter_LeScanCallbackType
@@ -1648,6 +1752,18 @@ class BluetoothSocket extends jni.JObject {
   int getConnectionType() {
     return _getConnectionType(reference).integer;
   }
+
+  static final _toString1 = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "BluetoothSocket__toString1")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public java.lang.String toString()
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JString toString1() {
+    return const jni.JStringType().fromRef(_toString1(reference).object);
+  }
 }
 
 final class $BluetoothSocketType extends jni.JObjType<BluetoothSocket> {
@@ -2100,6 +2216,30 @@ class BroadcastReceiver extends jni.JObject {
     return _setOrderedHint(reference, z ? 1 : 0).check();
   }
 
+  static final _getSentFromUid = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "BroadcastReceiver__getSentFromUid")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int getSentFromUid()
+  int getSentFromUid() {
+    return _getSentFromUid(reference).integer;
+  }
+
+  static final _getSentFromPackage = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "BroadcastReceiver__getSentFromPackage")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public java.lang.String getSentFromPackage()
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JString getSentFromPackage() {
+    return const jni.JStringType()
+        .fromRef(_getSentFromPackage(reference).object);
+  }
+
   static final _setDebugUnregister = jniLookup<
           ffi.NativeFunction<
               jni.JniResult Function(ffi.Pointer<ffi.Void>,
@@ -2151,6 +2291,58 @@ final class $BroadcastReceiverType extends jni.JObjType<BroadcastReceiver> {
   }
 }
 
+/// from: android.content.Context$BindServiceFlags
+class Context_BindServiceFlags extends jni.JObject {
+  @override
+  late final jni.JObjType<Context_BindServiceFlags> $type = type;
+
+  Context_BindServiceFlags.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $Context_BindServiceFlagsType();
+  static final _of =
+      jniLookup<ffi.NativeFunction<jni.JniResult Function(ffi.Int64)>>(
+              "Context_BindServiceFlags__of")
+          .asFunction<jni.JniResult Function(int)>();
+
+  /// from: static public android.content.Context$BindServiceFlags of(long j)
+  /// The returned object must be released after use, by calling the [release] method.
+  static Context_BindServiceFlags of(
+    int j,
+  ) {
+    return const $Context_BindServiceFlagsType().fromRef(_of(j).object);
+  }
+}
+
+final class $Context_BindServiceFlagsType
+    extends jni.JObjType<Context_BindServiceFlags> {
+  const $Context_BindServiceFlagsType();
+
+  @override
+  String get signature => r"Landroid/content/Context$BindServiceFlags;";
+
+  @override
+  Context_BindServiceFlags fromRef(jni.JObjectPtr ref) =>
+      Context_BindServiceFlags.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($Context_BindServiceFlagsType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($Context_BindServiceFlagsType) &&
+        other is $Context_BindServiceFlagsType;
+  }
+}
+
 /// from: android.content.Context
 class Context extends jni.JObject {
   @override
@@ -2196,6 +2388,9 @@ class Context extends jni.JObject {
   /// from: static public final int BIND_ADJUST_WITH_ACTIVITY
   static const BIND_ADJUST_WITH_ACTIVITY = 128;
 
+  /// from: static public final int BIND_ALLOW_ACTIVITY_STARTS
+  static const BIND_ALLOW_ACTIVITY_STARTS = 512;
+
   /// from: static public final int BIND_ALLOW_OOM_MANAGEMENT
   static const BIND_ALLOW_OOM_MANAGEMENT = 16;
 
@@ -2208,6 +2403,9 @@ class Context extends jni.JObject {
   /// from: static public final int BIND_EXTERNAL_SERVICE
   static const BIND_EXTERNAL_SERVICE = -2147483648;
 
+  /// from: static public final long BIND_EXTERNAL_SERVICE_LONG
+  static const BIND_EXTERNAL_SERVICE_LONG = 4611686018427387904;
+
   /// from: static public final int BIND_IMPORTANT
   static const BIND_IMPORTANT = 64;
 
@@ -2219,6 +2417,9 @@ class Context extends jni.JObject {
 
   /// from: static public final int BIND_NOT_PERCEPTIBLE
   static const BIND_NOT_PERCEPTIBLE = 256;
+
+  /// from: static public final int BIND_SHARED_ISOLATED_PROCESS
+  static const BIND_SHARED_ISOLATED_PROCESS = 8192;
 
   /// from: static public final int BIND_WAIVE_PRIORITY
   static const BIND_WAIVE_PRIORITY = 32;
@@ -2269,8 +2470,20 @@ class Context extends jni.JObject {
   /// from: static public final int CONTEXT_RESTRICTED
   static const CONTEXT_RESTRICTED = 4;
 
+  /// from: static public final java.lang.String CREDENTIAL_SERVICE
+  static const CREDENTIAL_SERVICE = r"""credential""";
+
   /// from: static public final java.lang.String CROSS_PROFILE_APPS_SERVICE
   static const CROSS_PROFILE_APPS_SERVICE = r"""crossprofileapps""";
+
+  /// from: static public final int DEVICE_ID_DEFAULT
+  static const DEVICE_ID_DEFAULT = 0;
+
+  /// from: static public final int DEVICE_ID_INVALID
+  static const DEVICE_ID_INVALID = -1;
+
+  /// from: static public final java.lang.String DEVICE_LOCK_SERVICE
+  static const DEVICE_LOCK_SERVICE = r"""device_lock""";
 
   /// from: static public final java.lang.String DEVICE_POLICY_SERVICE
   static const DEVICE_POLICY_SERVICE = r"""device_policy""";
@@ -2302,8 +2515,14 @@ class Context extends jni.JObject {
   /// from: static public final java.lang.String GAME_SERVICE
   static const GAME_SERVICE = r"""game""";
 
+  /// from: static public final java.lang.String GRAMMATICAL_INFLECTION_SERVICE
+  static const GRAMMATICAL_INFLECTION_SERVICE = r"""grammatical_inflection""";
+
   /// from: static public final java.lang.String HARDWARE_PROPERTIES_SERVICE
   static const HARDWARE_PROPERTIES_SERVICE = r"""hardware_properties""";
+
+  /// from: static public final java.lang.String HEALTHCONNECT_SERVICE
+  static const HEALTHCONNECT_SERVICE = r"""healthconnect""";
 
   /// from: static public final java.lang.String INPUT_METHOD_SERVICE
   static const INPUT_METHOD_SERVICE = r"""input_method""";
@@ -2382,6 +2601,9 @@ class Context extends jni.JObject {
 
   /// from: static public final java.lang.String NSD_SERVICE
   static const NSD_SERVICE = r"""servicediscovery""";
+
+  /// from: static public final java.lang.String OVERLAY_SERVICE
+  static const OVERLAY_SERVICE = r"""overlay""";
 
   /// from: static public final java.lang.String PEOPLE_SERVICE
   static const PEOPLE_SERVICE = r"""people""";
@@ -2473,6 +2695,9 @@ class Context extends jni.JObject {
 
   /// from: static public final java.lang.String VIBRATOR_SERVICE
   static const VIBRATOR_SERVICE = r"""vibrator""";
+
+  /// from: static public final java.lang.String VIRTUAL_DEVICE_SERVICE
+  static const VIRTUAL_DEVICE_SERVICE = r"""virtualdevice""";
 
   /// from: static public final java.lang.String VPN_MANAGEMENT_SERVICE
   static const VPN_MANAGEMENT_SERVICE = r"""vpn_management""";
@@ -3624,6 +3849,28 @@ class Context extends jni.JObject {
         .check();
   }
 
+  static final _sendBroadcast2 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("Context__sendBroadcast2")
+      .asFunction<
+          jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void sendBroadcast(android.content.Intent intent, java.lang.String string, android.os.Bundle bundle)
+  void sendBroadcast2(
+    Intent intent,
+    jni.JString string,
+    jni.JObject bundle,
+  ) {
+    return _sendBroadcast2(
+            reference, intent.reference, string.reference, bundle.reference)
+        .check();
+  }
+
   static final _sendOrderedBroadcast = jniLookup<
           ffi.NativeFunction<
               jni.JniResult Function(
@@ -3649,11 +3896,33 @@ class Context extends jni.JObject {
                   ffi.Pointer<ffi.Void>,
                   ffi.Pointer<ffi.Void>,
                   ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("Context__sendOrderedBroadcast1")
+      .asFunction<
+          jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void sendOrderedBroadcast(android.content.Intent intent, java.lang.String string, android.os.Bundle bundle)
+  void sendOrderedBroadcast1(
+    Intent intent,
+    jni.JString string,
+    jni.JObject bundle,
+  ) {
+    return _sendOrderedBroadcast1(
+            reference, intent.reference, string.reference, bundle.reference)
+        .check();
+  }
+
+  static final _sendOrderedBroadcast2 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
                   ffi.Pointer<ffi.Void>,
                   ffi.Pointer<ffi.Void>,
                   ffi.Int32,
                   ffi.Pointer<ffi.Void>,
-                  ffi.Pointer<ffi.Void>)>>("Context__sendOrderedBroadcast1")
+                  ffi.Pointer<ffi.Void>)>>("Context__sendOrderedBroadcast2")
       .asFunction<
           jni.JniResult Function(
               ffi.Pointer<ffi.Void>,
@@ -3666,7 +3935,7 @@ class Context extends jni.JObject {
               ffi.Pointer<ffi.Void>)>();
 
   /// from: public abstract void sendOrderedBroadcast(android.content.Intent intent, java.lang.String string, android.content.BroadcastReceiver broadcastReceiver, android.os.Handler handler, int i, java.lang.String string1, android.os.Bundle bundle)
-  void sendOrderedBroadcast1(
+  void sendOrderedBroadcast2(
     Intent intent,
     jni.JString string,
     BroadcastReceiver broadcastReceiver,
@@ -3675,7 +3944,7 @@ class Context extends jni.JObject {
     jni.JString string1,
     jni.JObject bundle,
   ) {
-    return _sendOrderedBroadcast1(
+    return _sendOrderedBroadcast2(
             reference,
             intent.reference,
             string.reference,
@@ -3684,6 +3953,54 @@ class Context extends jni.JObject {
             i,
             string1.reference,
             bundle.reference)
+        .check();
+  }
+
+  static final _sendOrderedBroadcast3 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Int32,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("Context__sendOrderedBroadcast3")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              int,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void sendOrderedBroadcast(android.content.Intent intent, java.lang.String string, android.os.Bundle bundle, android.content.BroadcastReceiver broadcastReceiver, android.os.Handler handler, int i, java.lang.String string1, android.os.Bundle bundle1)
+  void sendOrderedBroadcast3(
+    Intent intent,
+    jni.JString string,
+    jni.JObject bundle,
+    BroadcastReceiver broadcastReceiver,
+    jni.JObject handler,
+    int i,
+    jni.JString string1,
+    jni.JObject bundle1,
+  ) {
+    return _sendOrderedBroadcast3(
+            reference,
+            intent.reference,
+            string.reference,
+            bundle.reference,
+            broadcastReceiver.reference,
+            handler.reference,
+            i,
+            string1.reference,
+            bundle1.reference)
         .check();
   }
 
@@ -3778,7 +4095,7 @@ class Context extends jni.JObject {
         .check();
   }
 
-  static final _sendOrderedBroadcast2 = jniLookup<
+  static final _sendOrderedBroadcast4 = jniLookup<
           ffi.NativeFunction<
               jni.JniResult Function(
                   ffi.Pointer<ffi.Void>,
@@ -3789,7 +4106,7 @@ class Context extends jni.JObject {
                   ffi.Pointer<ffi.Void>,
                   ffi.Int32,
                   ffi.Pointer<ffi.Void>,
-                  ffi.Pointer<ffi.Void>)>>("Context__sendOrderedBroadcast2")
+                  ffi.Pointer<ffi.Void>)>>("Context__sendOrderedBroadcast4")
       .asFunction<
           jni.JniResult Function(
               ffi.Pointer<ffi.Void>,
@@ -3803,7 +4120,7 @@ class Context extends jni.JObject {
               ffi.Pointer<ffi.Void>)>();
 
   /// from: public void sendOrderedBroadcast(android.content.Intent intent, java.lang.String string, java.lang.String string1, android.content.BroadcastReceiver broadcastReceiver, android.os.Handler handler, int i, java.lang.String string2, android.os.Bundle bundle)
-  void sendOrderedBroadcast2(
+  void sendOrderedBroadcast4(
     Intent intent,
     jni.JString string,
     jni.JString string1,
@@ -3813,7 +4130,7 @@ class Context extends jni.JObject {
     jni.JString string2,
     jni.JObject bundle,
   ) {
-    return _sendOrderedBroadcast2(
+    return _sendOrderedBroadcast4(
             reference,
             intent.reference,
             string.reference,
@@ -4205,21 +4522,75 @@ class Context extends jni.JObject {
               jni.JniResult Function(
                   ffi.Pointer<ffi.Void>,
                   ffi.Pointer<ffi.Void>,
-                  ffi.Int32,
                   ffi.Pointer<ffi.Void>,
                   ffi.Pointer<ffi.Void>)>>("Context__bindService1")
+      .asFunction<
+          jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public boolean bindService(android.content.Intent intent, android.content.ServiceConnection serviceConnection, android.content.Context$BindServiceFlags bindServiceFlags)
+  bool bindService1(
+    Intent intent,
+    jni.JObject serviceConnection,
+    Context_BindServiceFlags bindServiceFlags,
+  ) {
+    return _bindService1(reference, intent.reference,
+            serviceConnection.reference, bindServiceFlags.reference)
+        .boolean;
+  }
+
+  static final _bindService2 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Int32,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("Context__bindService2")
       .asFunction<
           jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>,
               int, ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
 
   /// from: public boolean bindService(android.content.Intent intent, int i, java.util.concurrent.Executor executor, android.content.ServiceConnection serviceConnection)
-  bool bindService1(
+  bool bindService2(
     Intent intent,
     int i,
     jni.JObject executor,
     jni.JObject serviceConnection,
   ) {
-    return _bindService1(reference, intent.reference, i, executor.reference,
+    return _bindService2(reference, intent.reference, i, executor.reference,
+            serviceConnection.reference)
+        .boolean;
+  }
+
+  static final _bindService3 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("Context__bindService3")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>();
+
+  /// from: public boolean bindService(android.content.Intent intent, android.content.Context$BindServiceFlags bindServiceFlags, java.util.concurrent.Executor executor, android.content.ServiceConnection serviceConnection)
+  bool bindService3(
+    Intent intent,
+    Context_BindServiceFlags bindServiceFlags,
+    jni.JObject executor,
+    jni.JObject serviceConnection,
+  ) {
+    return _bindService3(
+            reference,
+            intent.reference,
+            bindServiceFlags.reference,
+            executor.reference,
             serviceConnection.reference)
         .boolean;
   }
@@ -4255,6 +4626,42 @@ class Context extends jni.JObject {
         .boolean;
   }
 
+  static final _bindIsolatedService1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("Context__bindIsolatedService1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>();
+
+  /// from: public boolean bindIsolatedService(android.content.Intent intent, android.content.Context$BindServiceFlags bindServiceFlags, java.lang.String string, java.util.concurrent.Executor executor, android.content.ServiceConnection serviceConnection)
+  bool bindIsolatedService1(
+    Intent intent,
+    Context_BindServiceFlags bindServiceFlags,
+    jni.JString string,
+    jni.JObject executor,
+    jni.JObject serviceConnection,
+  ) {
+    return _bindIsolatedService1(
+            reference,
+            intent.reference,
+            bindServiceFlags.reference,
+            string.reference,
+            executor.reference,
+            serviceConnection.reference)
+        .boolean;
+  }
+
   static final _bindServiceAsUser = jniLookup<
           ffi.NativeFunction<
               jni.JniResult Function(
@@ -4276,6 +4683,38 @@ class Context extends jni.JObject {
   ) {
     return _bindServiceAsUser(reference, intent.reference,
             serviceConnection.reference, i, userHandle.reference)
+        .boolean;
+  }
+
+  static final _bindServiceAsUser1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("Context__bindServiceAsUser1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>();
+
+  /// from: public boolean bindServiceAsUser(android.content.Intent intent, android.content.ServiceConnection serviceConnection, android.content.Context$BindServiceFlags bindServiceFlags, android.os.UserHandle userHandle)
+  bool bindServiceAsUser1(
+    Intent intent,
+    jni.JObject serviceConnection,
+    Context_BindServiceFlags bindServiceFlags,
+    jni.JObject userHandle,
+  ) {
+    return _bindServiceAsUser1(
+            reference,
+            intent.reference,
+            serviceConnection.reference,
+            bindServiceFlags.reference,
+            userHandle.reference)
         .boolean;
   }
 
@@ -4942,6 +5381,21 @@ class Context extends jni.JObject {
         .fromRef(_createDisplayContext(reference, display.reference).object);
   }
 
+  static final _createDeviceContext = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Int32)>>("Context__createDeviceContext")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>, int)>();
+
+  /// from: public android.content.Context createDeviceContext(int i)
+  /// The returned object must be released after use, by calling the [release] method.
+  Context createDeviceContext(
+    int i,
+  ) {
+    return const $ContextType()
+        .fromRef(_createDeviceContext(reference, i).object);
+  }
+
   static final _createWindowContext = jniLookup<
           ffi.NativeFunction<
               jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Int32,
@@ -5040,6 +5494,53 @@ class Context extends jni.JObject {
   /// The returned object must be released after use, by calling the [release] method.
   jni.JObject getDisplay() {
     return const jni.JObjectType().fromRef(_getDisplay(reference).object);
+  }
+
+  static final _getDeviceId = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "Context__getDeviceId")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int getDeviceId()
+  int getDeviceId() {
+    return _getDeviceId(reference).integer;
+  }
+
+  static final _registerDeviceIdChangeListener = jniLookup<
+              ffi.NativeFunction<
+                  jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                      ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>>(
+          "Context__registerDeviceIdChangeListener")
+      .asFunction<
+          jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void registerDeviceIdChangeListener(java.util.concurrent.Executor executor, java.util.function.IntConsumer intConsumer)
+  void registerDeviceIdChangeListener(
+    jni.JObject executor,
+    jni.JObject intConsumer,
+  ) {
+    return _registerDeviceIdChangeListener(
+            reference, executor.reference, intConsumer.reference)
+        .check();
+  }
+
+  static final _unregisterDeviceIdChangeListener = jniLookup<
+              ffi.NativeFunction<
+                  jni.JniResult Function(
+                      ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>>(
+          "Context__unregisterDeviceIdChangeListener")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void unregisterDeviceIdChangeListener(java.util.function.IntConsumer intConsumer)
+  void unregisterDeviceIdChangeListener(
+    jni.JObject intConsumer,
+  ) {
+    return _unregisterDeviceIdChangeListener(reference, intConsumer.reference)
+        .check();
   }
 
   static final _isRestricted = jniLookup<
@@ -5456,6 +5957,9 @@ class Intent extends jni.JObject {
   static const ACTION_CREATE_DOCUMENT =
       r"""android.intent.action.CREATE_DOCUMENT""";
 
+  /// from: static public final java.lang.String ACTION_CREATE_NOTE
+  static const ACTION_CREATE_NOTE = r"""android.intent.action.CREATE_NOTE""";
+
   /// from: static public final java.lang.String ACTION_CREATE_REMINDER
   static const ACTION_CREATE_REMINDER =
       r"""android.intent.action.CREATE_REMINDER""";
@@ -5548,6 +6052,10 @@ class Intent extends jni.JObject {
   /// from: static public final java.lang.String ACTION_INSTALL_PACKAGE
   static const ACTION_INSTALL_PACKAGE =
       r"""android.intent.action.INSTALL_PACKAGE""";
+
+  /// from: static public final java.lang.String ACTION_LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE
+  static const ACTION_LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE =
+      r"""android.intent.action.LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE""";
 
   /// from: static public final java.lang.String ACTION_LOCALE_CHANGED
   static const ACTION_LOCALE_CHANGED =
@@ -5745,9 +6253,17 @@ class Intent extends jni.JObject {
   static const ACTION_PROFILE_ACCESSIBLE =
       r"""android.intent.action.PROFILE_ACCESSIBLE""";
 
+  /// from: static public final java.lang.String ACTION_PROFILE_ADDED
+  static const ACTION_PROFILE_ADDED =
+      r"""android.intent.action.PROFILE_ADDED""";
+
   /// from: static public final java.lang.String ACTION_PROFILE_INACCESSIBLE
   static const ACTION_PROFILE_INACCESSIBLE =
       r"""android.intent.action.PROFILE_INACCESSIBLE""";
+
+  /// from: static public final java.lang.String ACTION_PROFILE_REMOVED
+  static const ACTION_PROFILE_REMOVED =
+      r"""android.intent.action.PROFILE_REMOVED""";
 
   /// from: static public final java.lang.String ACTION_PROVIDER_CHANGED
   static const ACTION_PROVIDER_CHANGED =
@@ -5885,6 +6401,21 @@ class Intent extends jni.JObject {
 
   /// from: static public final java.lang.String ACTION_WEB_SEARCH
   static const ACTION_WEB_SEARCH = r"""android.intent.action.WEB_SEARCH""";
+
+  /// from: static public final int CAPTURE_CONTENT_FOR_NOTE_BLOCKED_BY_ADMIN
+  static const CAPTURE_CONTENT_FOR_NOTE_BLOCKED_BY_ADMIN = 4;
+
+  /// from: static public final int CAPTURE_CONTENT_FOR_NOTE_FAILED
+  static const CAPTURE_CONTENT_FOR_NOTE_FAILED = 1;
+
+  /// from: static public final int CAPTURE_CONTENT_FOR_NOTE_SUCCESS
+  static const CAPTURE_CONTENT_FOR_NOTE_SUCCESS = 0;
+
+  /// from: static public final int CAPTURE_CONTENT_FOR_NOTE_USER_CANCELED
+  static const CAPTURE_CONTENT_FOR_NOTE_USER_CANCELED = 2;
+
+  /// from: static public final int CAPTURE_CONTENT_FOR_NOTE_WINDOW_MODE_UNSUPPORTED
+  static const CAPTURE_CONTENT_FOR_NOTE_WINDOW_MODE_UNSUPPORTED = 3;
 
   /// from: static public final java.lang.String CATEGORY_ACCESSIBILITY_SHORTCUT_TARGET
   static const CATEGORY_ACCESSIBILITY_SHORTCUT_TARGET =
@@ -6085,6 +6616,10 @@ class Intent extends jni.JObject {
   /// from: static public final java.lang.String EXTRA_BUG_REPORT
   static const EXTRA_BUG_REPORT = r"""android.intent.extra.BUG_REPORT""";
 
+  /// from: static public final java.lang.String EXTRA_CAPTURE_CONTENT_FOR_NOTE_STATUS_CODE
+  static const EXTRA_CAPTURE_CONTENT_FOR_NOTE_STATUS_CODE =
+      r"""android.intent.extra.CAPTURE_CONTENT_FOR_NOTE_STATUS_CODE""";
+
   /// from: static public final java.lang.String EXTRA_CC
   static const EXTRA_CC = r"""android.intent.extra.CC""";
 
@@ -6103,6 +6638,14 @@ class Intent extends jni.JObject {
   /// from: static public final java.lang.String EXTRA_CHANGED_UID_LIST
   static const EXTRA_CHANGED_UID_LIST =
       r"""android.intent.extra.changed_uid_list""";
+
+  /// from: static public final java.lang.String EXTRA_CHOOSER_CUSTOM_ACTIONS
+  static const EXTRA_CHOOSER_CUSTOM_ACTIONS =
+      r"""android.intent.extra.CHOOSER_CUSTOM_ACTIONS""";
+
+  /// from: static public final java.lang.String EXTRA_CHOOSER_MODIFY_SHARE_ACTION
+  static const EXTRA_CHOOSER_MODIFY_SHARE_ACTION =
+      r"""android.intent.extra.CHOOSER_MODIFY_SHARE_ACTION""";
 
   /// from: static public final java.lang.String EXTRA_CHOOSER_REFINEMENT_INTENT_SENDER
   static const EXTRA_CHOOSER_REFINEMENT_INTENT_SENDER =
@@ -6211,6 +6754,9 @@ class Intent extends jni.JObject {
   /// from: static public final java.lang.String EXTRA_ORIGINATING_URI
   static const EXTRA_ORIGINATING_URI =
       r"""android.intent.extra.ORIGINATING_URI""";
+
+  /// from: static public final java.lang.String EXTRA_PACKAGES
+  static const EXTRA_PACKAGES = r"""android.intent.extra.PACKAGES""";
 
   /// from: static public final java.lang.String EXTRA_PACKAGE_NAME
   static const EXTRA_PACKAGE_NAME = r"""android.intent.extra.PACKAGE_NAME""";
@@ -6333,6 +6879,10 @@ class Intent extends jni.JObject {
   /// from: static public final java.lang.String EXTRA_USER_INITIATED
   static const EXTRA_USER_INITIATED =
       r"""android.intent.extra.USER_INITIATED""";
+
+  /// from: static public final java.lang.String EXTRA_USE_STYLUS_MODE
+  static const EXTRA_USE_STYLUS_MODE =
+      r"""android.intent.extra.USE_STYLUS_MODE""";
 
   /// from: static public final int FILL_IN_ACTION
   static const FILL_IN_ACTION = 1;

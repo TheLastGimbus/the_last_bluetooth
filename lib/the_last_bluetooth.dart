@@ -11,10 +11,25 @@ class TheLastBluetooth {
   static final TheLastBluetooth _instance = TheLastBluetooth._();
 
   static TheLastBluetooth get instance => _instance;
+
+  late android.BluetoothManager _manager;
+  late android.BluetoothAdapter _adapter;
+
+  // Our streams for user:
   final _isEnabledCtrl = BehaviorSubject<bool>();
 
   TheLastBluetooth._() {
     // this is some init stuff - maybe move this to manual init() dispose() ?
+    final ctx = android.Context.fromRef(Jni.getCachedApplicationContext());
+    _manager = android.BluetoothManager.fromRef(
+      ctx
+          .getSystemService(android.Context.BLUETOOTH_SERVICE.toJString())
+          .reference,
+    );
+    _adapter = _manager.getAdapter();
+
+    _isEnabledCtrl.add(_adapter.isEnabled());
+
     fb.BroadcastReceiver receiver = fb.BroadcastReceiver(
       names: <String>[android.BluetoothAdapter.ACTION_STATE_CHANGED],
     );
@@ -40,16 +55,7 @@ class TheLastBluetooth {
       }
     });
     receiver.start();
-
-    final ctx = android.Context.fromRef(Jni.getCachedApplicationContext());
-    // final android.BluetoothManager bm = android.BluetoothManager.fromRef(
-    //   ctx
-    //       .getSystemService(android.Context.BLUETOOTH_SERVICE.toJString())
-    //       .reference,
-    // );
-    // final adapter = bm.getAdapter();
   }
-
 
   // TODO: Make this real
   ValueStream<bool> get isAvailable => Stream.value(true).shareValue();
