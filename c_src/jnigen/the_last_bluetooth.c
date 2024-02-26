@@ -8533,3 +8533,102 @@ JniResult get_IntentFilter__CREATOR() {
                                                     _f_IntentFilter__CREATOR);
   return to_global_ref_result(_result);
 }
+
+// com.lastgimbus.the.lastbluetooth.TheLastUtils$Companion
+jclass _c_TheLastUtils_Companion = NULL;
+
+jmethodID _m_TheLastUtils_Companion__isBluetoothDeviceConnected = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils_Companion__isBluetoothDeviceConnected(
+    jobject self_,
+    jobject bluetoothDevice) {
+  load_env();
+  load_class_global_ref(
+      &_c_TheLastUtils_Companion,
+      "com/lastgimbus/the/lastbluetooth/TheLastUtils$Companion");
+  if (_c_TheLastUtils_Companion == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_TheLastUtils_Companion,
+              &_m_TheLastUtils_Companion__isBluetoothDeviceConnected,
+              "isBluetoothDeviceConnected",
+              "(Landroid/bluetooth/BluetoothDevice;)Z");
+  if (_m_TheLastUtils_Companion__isBluetoothDeviceConnected == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result = (*jniEnv)->CallBooleanMethod(
+      jniEnv, self_, _m_TheLastUtils_Companion__isBluetoothDeviceConnected,
+      bluetoothDevice);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_TheLastUtils_Companion__new0 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils_Companion__new0(jobject defaultConstructorMarker) {
+  load_env();
+  load_class_global_ref(
+      &_c_TheLastUtils_Companion,
+      "com/lastgimbus/the/lastbluetooth/TheLastUtils$Companion");
+  if (_c_TheLastUtils_Companion == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_TheLastUtils_Companion, &_m_TheLastUtils_Companion__new0,
+              "<init>", "(Lkotlin/jvm/internal/DefaultConstructorMarker;)V");
+  if (_m_TheLastUtils_Companion__new0 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->NewObject(jniEnv, _c_TheLastUtils_Companion,
+                                         _m_TheLastUtils_Companion__new0,
+                                         defaultConstructorMarker);
+  return to_global_ref_result(_result);
+}
+
+// com.lastgimbus.the.lastbluetooth.TheLastUtils
+jclass _c_TheLastUtils = NULL;
+
+jmethodID _m_TheLastUtils__new0 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils__new0() {
+  load_env();
+  load_class_global_ref(&_c_TheLastUtils,
+                        "com/lastgimbus/the/lastbluetooth/TheLastUtils");
+  if (_c_TheLastUtils == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_TheLastUtils, &_m_TheLastUtils__new0, "<init>", "()V");
+  if (_m_TheLastUtils__new0 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->NewObject(jniEnv, _c_TheLastUtils, _m_TheLastUtils__new0);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_TheLastUtils__isBluetoothDeviceConnected = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils__isBluetoothDeviceConnected(jobject bluetoothDevice) {
+  load_env();
+  load_class_global_ref(&_c_TheLastUtils,
+                        "com/lastgimbus/the/lastbluetooth/TheLastUtils");
+  if (_c_TheLastUtils == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(
+      _c_TheLastUtils, &_m_TheLastUtils__isBluetoothDeviceConnected,
+      "isBluetoothDeviceConnected", "(Landroid/bluetooth/BluetoothDevice;)Z");
+  if (_m_TheLastUtils__isBluetoothDeviceConnected == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result = (*jniEnv)->CallStaticBooleanMethod(
+      jniEnv, _c_TheLastUtils, _m_TheLastUtils__isBluetoothDeviceConnected,
+      bluetoothDevice);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jfieldID _f_TheLastUtils__Companion = NULL;
+FFI_PLUGIN_EXPORT
+JniResult get_TheLastUtils__Companion() {
+  load_env();
+  load_class_global_ref(&_c_TheLastUtils,
+                        "com/lastgimbus/the/lastbluetooth/TheLastUtils");
+  if (_c_TheLastUtils == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_field(
+      _c_TheLastUtils, &_f_TheLastUtils__Companion, "Companion",
+      "Lcom/lastgimbus/the/lastbluetooth/TheLastUtils$Companion;");
+  jobject _result = (*jniEnv)->GetStaticObjectField(jniEnv, _c_TheLastUtils,
+                                                    _f_TheLastUtils__Companion);
+  return to_global_ref_result(_result);
+}

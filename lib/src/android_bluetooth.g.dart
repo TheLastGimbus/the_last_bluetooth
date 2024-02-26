@@ -10412,3 +10412,145 @@ final class $IntentFilterType extends jni.JObjType<IntentFilter> {
         other is $IntentFilterType;
   }
 }
+
+/// from: com.lastgimbus.the.lastbluetooth.TheLastUtils$Companion
+class TheLastUtils_Companion extends jni.JObject {
+  @override
+  late final jni.JObjType<TheLastUtils_Companion> $type = type;
+
+  TheLastUtils_Companion.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $TheLastUtils_CompanionType();
+  static final _isBluetoothDeviceConnected = jniLookup<
+              ffi.NativeFunction<
+                  jni.JniResult Function(
+                      ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>>(
+          "TheLastUtils_Companion__isBluetoothDeviceConnected")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public final boolean isBluetoothDeviceConnected(android.bluetooth.BluetoothDevice bluetoothDevice)
+  bool isBluetoothDeviceConnected(
+    BluetoothDevice bluetoothDevice,
+  ) {
+    return _isBluetoothDeviceConnected(reference, bluetoothDevice.reference)
+        .boolean;
+  }
+
+  static final _new0 = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "TheLastUtils_Companion__new0")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void <init>(kotlin.jvm.internal.DefaultConstructorMarker defaultConstructorMarker)
+  /// The returned object must be released after use, by calling the [release] method.
+  factory TheLastUtils_Companion(
+    jni.JObject defaultConstructorMarker,
+  ) {
+    return TheLastUtils_Companion.fromRef(
+        _new0(defaultConstructorMarker.reference).object);
+  }
+}
+
+final class $TheLastUtils_CompanionType
+    extends jni.JObjType<TheLastUtils_Companion> {
+  const $TheLastUtils_CompanionType();
+
+  @override
+  String get signature =>
+      r"Lcom/lastgimbus/the/lastbluetooth/TheLastUtils$Companion;";
+
+  @override
+  TheLastUtils_Companion fromRef(jni.JObjectPtr ref) =>
+      TheLastUtils_Companion.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($TheLastUtils_CompanionType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($TheLastUtils_CompanionType) &&
+        other is $TheLastUtils_CompanionType;
+  }
+}
+
+/// from: com.lastgimbus.the.lastbluetooth.TheLastUtils
+class TheLastUtils extends jni.JObject {
+  @override
+  late final jni.JObjType<TheLastUtils> $type = type;
+
+  TheLastUtils.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $TheLastUtilsType();
+  static final _get_Companion =
+      jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+              "get_TheLastUtils__Companion")
+          .asFunction<jni.JniResult Function()>();
+
+  /// from: static public final com.lastgimbus.the.lastbluetooth.TheLastUtils$Companion Companion
+  /// The returned object must be released after use, by calling the [release] method.
+  static TheLastUtils_Companion get Companion =>
+      const $TheLastUtils_CompanionType().fromRef(_get_Companion().object);
+
+  static final _new0 = jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+          "TheLastUtils__new0")
+      .asFunction<jni.JniResult Function()>();
+
+  /// from: public void <init>()
+  /// The returned object must be released after use, by calling the [release] method.
+  factory TheLastUtils() {
+    return TheLastUtils.fromRef(_new0().object);
+  }
+
+  static final _isBluetoothDeviceConnected = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "TheLastUtils__isBluetoothDeviceConnected")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: static public final boolean isBluetoothDeviceConnected(android.bluetooth.BluetoothDevice bluetoothDevice)
+  static bool isBluetoothDeviceConnected(
+    BluetoothDevice bluetoothDevice,
+  ) {
+    return _isBluetoothDeviceConnected(bluetoothDevice.reference).boolean;
+  }
+}
+
+final class $TheLastUtilsType extends jni.JObjType<TheLastUtils> {
+  const $TheLastUtilsType();
+
+  @override
+  String get signature => r"Lcom/lastgimbus/the/lastbluetooth/TheLastUtils;";
+
+  @override
+  TheLastUtils fromRef(jni.JObjectPtr ref) => TheLastUtils.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($TheLastUtilsType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($TheLastUtilsType) &&
+        other is $TheLastUtilsType;
+  }
+}

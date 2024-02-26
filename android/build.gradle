@@ -4,6 +4,9 @@ group 'com.lastgimbus.the.lastbluetooth'
 version '1.0'
 
 buildscript {
+    ext {
+        kotlin_version = '1.9.22'
+    }
     repositories {
         google()
         mavenCentral()
@@ -12,6 +15,7 @@ buildscript {
     dependencies {
         // The Android Gradle Plugin knows how to build native code with the NDK.
         classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -23,6 +27,7 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     if (project.android.hasProperty("namespace")) {
@@ -61,5 +66,8 @@ android {
 
     defaultConfig {
         minSdkVersion 19
+    }
+    kotlinOptions {
+        jvmTarget = '17'
     }
 }
