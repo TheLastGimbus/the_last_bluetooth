@@ -44,6 +44,11 @@ android {
     // (e.g. ndkVersion "23.1.7779620")
     ndkVersion android.ndkVersion
 
+    // Don't forget my Kotlin, gradle 🥺🥺
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     // Invoke the shared CMake build with the Android Gradle Plugin.
     externalNativeBuild {
         cmake {

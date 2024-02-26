@@ -1,7 +1,9 @@
 package com.lastgimbus.the.lastbluetooth;
 
 import android.bluetooth.BluetoothDevice
+import androidx.annotation.Keep
 
+@Keep
 class TheLastUtils() {
     companion object {
         @JvmStatic
