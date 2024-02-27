@@ -8,4 +8,6 @@ abstract class BluetoothDevice {
   ValueStream<String> get alias;
 
   ValueStream<bool> get isConnected;
+
+  Future<Set<String>> get uuids;
 }

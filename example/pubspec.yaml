@@ -33,6 +33,7 @@ dependencies:
     # the parent directory to use the current plugin's version.
     path: ../
   permission_handler: ^11.3.0
+  bluetooth_identifiers: ^1.1.1
 
 dev_dependencies:
   flutter_test:

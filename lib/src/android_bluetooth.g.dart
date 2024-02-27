@@ -1243,8 +1243,8 @@ class BluetoothDevice extends jni.JObject {
 
   /// from: public android.os.ParcelUuid[] getUuids()
   /// The returned object must be released after use, by calling the [release] method.
-  jni.JArray<jni.JObject> getUuids() {
-    return const jni.JArrayType(jni.JObjectType())
+  jni.JArray<ParcelUuid> getUuids() {
+    return const jni.JArrayType($ParcelUuidType())
         .fromRef(_getUuids(reference).object);
   }
 
@@ -10410,6 +10410,160 @@ final class $IntentFilterType extends jni.JObjType<IntentFilter> {
   bool operator ==(Object other) {
     return other.runtimeType == ($IntentFilterType) &&
         other is $IntentFilterType;
+  }
+}
+
+/// from: android.os.ParcelUuid
+class ParcelUuid extends jni.JObject {
+  @override
+  late final jni.JObjType<ParcelUuid> $type = type;
+
+  ParcelUuid.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $ParcelUuidType();
+  static final _get_CREATOR =
+      jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+              "get_ParcelUuid__CREATOR")
+          .asFunction<jni.JniResult Function()>();
+
+  /// from: static public final android.os.Parcelable$Creator CREATOR
+  /// The returned object must be released after use, by calling the [release] method.
+  static jni.JObject get CREATOR =>
+      const jni.JObjectType().fromRef(_get_CREATOR().object);
+
+  static final _new0 = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "ParcelUuid__new0")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void <init>(java.util.UUID uUID)
+  /// The returned object must be released after use, by calling the [release] method.
+  factory ParcelUuid(
+    jni.JObject uUID,
+  ) {
+    return ParcelUuid.fromRef(_new0(uUID.reference).object);
+  }
+
+  static final _fromString = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "ParcelUuid__fromString")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: static public android.os.ParcelUuid fromString(java.lang.String string)
+  /// The returned object must be released after use, by calling the [release] method.
+  static ParcelUuid fromString(
+    jni.JString string,
+  ) {
+    return const $ParcelUuidType()
+        .fromRef(_fromString(string.reference).object);
+  }
+
+  static final _getUuid = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "ParcelUuid__getUuid")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public java.util.UUID getUuid()
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JObject getUuid() {
+    return const jni.JObjectType().fromRef(_getUuid(reference).object);
+  }
+
+  static final _toString1 = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "ParcelUuid__toString1")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public java.lang.String toString()
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JString toString1() {
+    return const jni.JStringType().fromRef(_toString1(reference).object);
+  }
+
+  static final _hashCode1 = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "ParcelUuid__hashCode1")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int hashCode()
+  int hashCode1() {
+    return _hashCode1(reference).integer;
+  }
+
+  static final _equals1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("ParcelUuid__equals1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public boolean equals(java.lang.Object object)
+  bool equals1(
+    jni.JObject object,
+  ) {
+    return _equals1(reference, object.reference).boolean;
+  }
+
+  static final _describeContents = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "ParcelUuid__describeContents")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int describeContents()
+  int describeContents() {
+    return _describeContents(reference).integer;
+  }
+
+  static final _writeToParcel = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Int32)>>("ParcelUuid__writeToParcel")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>, int)>();
+
+  /// from: public void writeToParcel(android.os.Parcel parcel, int i)
+  void writeToParcel(
+    jni.JObject parcel,
+    int i,
+  ) {
+    return _writeToParcel(reference, parcel.reference, i).check();
+  }
+}
+
+final class $ParcelUuidType extends jni.JObjType<ParcelUuid> {
+  const $ParcelUuidType();
+
+  @override
+  String get signature => r"Landroid/os/ParcelUuid;";
+
+  @override
+  ParcelUuid fromRef(jni.JObjectPtr ref) => ParcelUuid.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($ParcelUuidType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($ParcelUuidType) && other is $ParcelUuidType;
   }
 }
 

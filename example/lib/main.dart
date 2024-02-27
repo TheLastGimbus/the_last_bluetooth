@@ -1,3 +1,4 @@
+import 'package:bluetooth_identifiers/bluetooth_identifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';
@@ -53,26 +54,55 @@ class _MyAppState extends State<MyApp> {
                             children: [
                               if (snap.hasData)
                                 for (final dev in snap.data!)
-                                  Row(
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      StreamBuilder(
-                                        stream: dev.name,
-                                        builder: (_, snap) =>
-                                            Text(snap.data ?? 'null'),
+                                      Row(
+                                        children: [
+                                          StreamBuilder(
+                                            stream: dev.name,
+                                            builder: (_, snap) =>
+                                                Text(snap.data ?? 'null'),
+                                          ),
+                                          const Text(' aka '),
+                                          StreamBuilder(
+                                            stream: dev.alias,
+                                            builder: (_, snap) =>
+                                                Text(snap.data ?? 'null'),
+                                          ),
+                                          const Text(' '),
+                                          StreamBuilder(
+                                            stream: dev.isConnected,
+                                            builder: (_, snap) => Text(
+                                                snap.data != null
+                                                    ? (snap.data! ? '✅' : '❌')
+                                                    : 'null'),
+                                          ),
+                                        ],
                                       ),
-                                      const Text(' aka '),
-                                      StreamBuilder(
-                                        stream: dev.alias,
-                                        builder: (_, snap) =>
-                                            Text(snap.data ?? 'null'),
-                                      ),
-                                      const Text(' '),
-                                      StreamBuilder(
-                                        stream: dev.isConnected,
-                                        builder: (_, snap) => Text(
-                                            snap.data != null
-                                                ? (snap.data! ? '✅' : '❌')
-                                                : 'null'),
+                                      FutureBuilder(
+                                        future: dev.uuids,
+                                        builder: (_, snap) => Column(
+                                          children: [
+                                            if (snap.hasData)
+                                              Text(
+                                                snap.data!
+                                                    .map((uuid) =>
+                                                        BluetoothIdentifiers
+                                                            .uuidServiceIdentifiers[
+                                                                int.parse(
+                                                                    uuid.substring(
+                                                                        4, 8),
+                                                                    radix: 16)]
+                                                            ?.registrant ??
+                                                        'null')
+                                                    .join(', '),
+                                                style: const TextStyle(
+                                                    fontSize: 10),
+                                              ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),

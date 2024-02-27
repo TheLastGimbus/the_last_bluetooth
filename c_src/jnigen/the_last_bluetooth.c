@@ -8534,6 +8534,150 @@ JniResult get_IntentFilter__CREATOR() {
   return to_global_ref_result(_result);
 }
 
+// android.os.ParcelUuid
+jclass _c_ParcelUuid = NULL;
+
+jmethodID _m_ParcelUuid__new0 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__new0(jobject uUID) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_ParcelUuid, &_m_ParcelUuid__new0, "<init>",
+              "(Ljava/util/UUID;)V");
+  if (_m_ParcelUuid__new0 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->NewObject(jniEnv, _c_ParcelUuid, _m_ParcelUuid__new0, uUID);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_ParcelUuid__fromString = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__fromString(jobject string) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_ParcelUuid, &_m_ParcelUuid__fromString, "fromString",
+                     "(Ljava/lang/String;)Landroid/os/ParcelUuid;");
+  if (_m_ParcelUuid__fromString == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallStaticObjectMethod(
+      jniEnv, _c_ParcelUuid, _m_ParcelUuid__fromString, string);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_ParcelUuid__getUuid = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__getUuid(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_ParcelUuid, &_m_ParcelUuid__getUuid, "getUuid",
+              "()Ljava/util/UUID;");
+  if (_m_ParcelUuid__getUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->CallObjectMethod(jniEnv, self_, _m_ParcelUuid__getUuid);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_ParcelUuid__toString1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__toString1(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_ParcelUuid, &_m_ParcelUuid__toString1, "toString",
+              "()Ljava/lang/String;");
+  if (_m_ParcelUuid__toString1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->CallObjectMethod(jniEnv, self_, _m_ParcelUuid__toString1);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_ParcelUuid__hashCode1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__hashCode1(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_ParcelUuid, &_m_ParcelUuid__hashCode1, "hashCode", "()I");
+  if (_m_ParcelUuid__hashCode1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_ParcelUuid__hashCode1);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_ParcelUuid__equals1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__equals1(jobject self_, jobject object) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_ParcelUuid, &_m_ParcelUuid__equals1, "equals",
+              "(Ljava/lang/Object;)Z");
+  if (_m_ParcelUuid__equals1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result = (*jniEnv)->CallBooleanMethod(
+      jniEnv, self_, _m_ParcelUuid__equals1, object);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_ParcelUuid__describeContents = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__describeContents(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_ParcelUuid, &_m_ParcelUuid__describeContents,
+              "describeContents", "()I");
+  if (_m_ParcelUuid__describeContents == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_ParcelUuid__describeContents);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_ParcelUuid__writeToParcel = NULL;
+FFI_PLUGIN_EXPORT
+JniResult ParcelUuid__writeToParcel(jobject self_, jobject parcel, int32_t i) {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_ParcelUuid, &_m_ParcelUuid__writeToParcel, "writeToParcel",
+              "(Landroid/os/Parcel;I)V");
+  if (_m_ParcelUuid__writeToParcel == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_ParcelUuid__writeToParcel, parcel,
+                            i);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jfieldID _f_ParcelUuid__CREATOR = NULL;
+FFI_PLUGIN_EXPORT
+JniResult get_ParcelUuid__CREATOR() {
+  load_env();
+  load_class_global_ref(&_c_ParcelUuid, "android/os/ParcelUuid");
+  if (_c_ParcelUuid == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_field(_c_ParcelUuid, &_f_ParcelUuid__CREATOR, "CREATOR",
+                    "Landroid/os/Parcelable$Creator;");
+  jobject _result = (*jniEnv)->GetStaticObjectField(jniEnv, _c_ParcelUuid,
+                                                    _f_ParcelUuid__CREATOR);
+  return to_global_ref_result(_result);
+}
+
 // com.lastgimbus.the.lastbluetooth.TheLastUtils$Companion
 jclass _c_TheLastUtils_Companion = NULL;
 

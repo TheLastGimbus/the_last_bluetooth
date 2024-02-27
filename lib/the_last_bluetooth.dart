@@ -37,19 +37,25 @@ class TheLastBluetooth {
     // emit devices when enabled, clear when disabled
     _isEnabledCtrl.listen((event) => event
         ? _pairedDevicesCtrl.add(
-            _adapter
-                .getBondedDevices()
-                .map(
-                  (dev) => _BluetoothDevice(
-                    dev.getAddress().toDString(),
-                    nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
-                    aliasCtrl:
-                        BehaviorSubject.seeded(dev.getAlias().toDString()),
-                    isConnectedCtrl: BehaviorSubject.seeded(
-                        android.TheLastUtils.isBluetoothDeviceConnected(dev)),
-                  ),
-                )
-                .toSet(),
+            _adapter.getBondedDevices().map(
+              (dev) {
+                final uuids = dev.getUuids();
+                return _BluetoothDevice(
+                  dev.getAddress().toDString(),
+                  nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
+                  aliasCtrl: BehaviorSubject.seeded(dev.getAlias().toDString()),
+                  isConnectedCtrl: BehaviorSubject.seeded(
+                      android.TheLastUtils.isBluetoothDeviceConnected(dev)),
+                  uuidsCompleter: Completer()
+                    ..complete(
+                      Iterable.generate(
+                        uuids.length,
+                        (i) => uuids[i].toString(),
+                      ).toSet(),
+                    ),
+                );
+              },
+            ).toSet(),
           )
         : _pairedDevicesCtrl.add(<_BluetoothDevice>{}));
     // this will also nicely trigger listener above :)
@@ -106,6 +112,7 @@ class TheLastBluetooth {
             android.BluetoothDevice.EXTRA_BOND_STATE.toJString(), -1);
         switch (bondState) {
           case android.BluetoothDevice.BOND_BONDED:
+            final uuids = extraDev.dev.getUuids();
             _pairedDevicesCtrl.add(
               _pairedDevicesCtrl.value
                 ..add(
@@ -118,6 +125,13 @@ class TheLastBluetooth {
                     isConnectedCtrl: BehaviorSubject.seeded(
                         android.TheLastUtils.isBluetoothDeviceConnected(
                             extraDev.dev)),
+                    uuidsCompleter: Completer()
+                      ..complete(
+                        Iterable.generate(
+                          uuids.length,
+                          (i) => uuids[i].toString(),
+                        ).toSet(),
+                      ),
                   ),
                 ),
             );
@@ -188,6 +202,7 @@ class _BluetoothDevice implements BluetoothDevice {
     required this.nameCtrl,
     required this.aliasCtrl,
     required this.isConnectedCtrl,
+    required this.uuidsCompleter,
   });
 
   /// Devices that randomize their MACs are currently out of scope of this
@@ -199,6 +214,7 @@ class _BluetoothDevice implements BluetoothDevice {
   final BehaviorSubject<String> nameCtrl;
   final BehaviorSubject<String> aliasCtrl;
   final BehaviorSubject<bool> isConnectedCtrl;
+  final Completer<Set<String>> uuidsCompleter;
 
   @override
   ValueStream<String> get name => nameCtrl.stream;
@@ -211,6 +227,9 @@ class _BluetoothDevice implements BluetoothDevice {
   // connected" away to some sub-class, or leave it just not emitting/responding
   @override
   ValueStream<bool> get isConnected => isConnectedCtrl.stream;
+
+  @override
+  Future<Set<String>> get uuids => uuidsCompleter.future;
 }
 
 extension on JString {

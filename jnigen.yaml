@@ -23,6 +23,7 @@ classes:
   - 'android.content.Context'
   - 'android.content.Intent'
   - 'android.content.IntentFilter'
+  - 'android.os.ParcelUuid'
   - 'com.lastgimbus.the.lastbluetooth.TheLastUtils'
   - 'com.lastgimbus.the.lastbluetooth.BroadcastReceiverInterface'
   - 'com.lastgimbus.the.lastbluetooth.TheLastBroadcastReceiver'
