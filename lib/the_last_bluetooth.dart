@@ -35,29 +35,39 @@ class TheLastBluetooth {
     _adapter = _manager.getAdapter();
 
     // emit devices when enabled, clear when disabled
-    _isEnabledCtrl.listen((event) => event
-        ? _pairedDevicesCtrl.add(
-            _adapter.getBondedDevices().map(
-              (dev) {
-                final uuids = dev.getUuids();
-                return _BluetoothDevice(
-                  dev.getAddress().toDString(),
-                  nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
-                  aliasCtrl: BehaviorSubject.seeded(dev.getAlias().toDString()),
-                  isConnectedCtrl: BehaviorSubject.seeded(
-                      android.TheLastUtils.isBluetoothDeviceConnected(dev)),
-                  uuidsCompleter: Completer()
-                    ..complete(
-                      Iterable.generate(
-                        uuids.length,
-                        (i) => uuids[i].toString(),
-                      ).toSet(),
-                    ),
-                );
-              },
-            ).toSet(),
-          )
-        : _pairedDevicesCtrl.add(<_BluetoothDevice>{}));
+    _isEnabledCtrl.listen((event) {
+      if (event) {
+        _pairedDevicesCtrl.add(
+          _adapter.getBondedDevices().map(
+            (dev) {
+              final uuids = dev.getUuids();
+              return _BluetoothDevice(
+                dev.getAddress().toDString(),
+                nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
+                aliasCtrl: BehaviorSubject.seeded(dev.getAlias().toDString()),
+                isConnectedCtrl: BehaviorSubject.seeded(
+                    android.TheLastUtils.isBluetoothDeviceConnected(dev)),
+                uuidsCompleter: Completer()
+                  ..complete(
+                    Iterable.generate(
+                      uuids.length,
+                      (i) => uuids[i].toString(),
+                    ).toSet(),
+                  ),
+              );
+            },
+          ).toSet(),
+        );
+      } else {
+        _pairedDevicesCtrl.valueOrNull?.forEach((dev) {
+          dev.nameCtrl.close();
+          dev.aliasCtrl.close();
+          dev.isConnectedCtrl.close();
+          dev.uuidsCompleter.complete(<String>{});
+        });
+        _pairedDevicesCtrl.add(<_BluetoothDevice>{});
+      }
+    });
     // this will also nicely trigger listener above :)
     _isEnabledCtrl.add(_adapter.isEnabled());
 
@@ -144,6 +154,7 @@ class TheLastBluetooth {
                     dev.nameCtrl.close();
                     dev.aliasCtrl.close();
                     dev.isConnectedCtrl.close();
+                    dev.uuidsCompleter.complete(<String>{});
                     return true;
                   } else {
                     return false;
