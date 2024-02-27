@@ -10441,6 +10441,24 @@ class TheLastUtils_Companion extends jni.JObject {
         .boolean;
   }
 
+  static final _getIntentExtras = jniLookup<
+              ffi.NativeFunction<
+                  jni.JniResult Function(
+                      ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>>(
+          "TheLastUtils_Companion__getIntentExtras")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public final java.util.Map getIntentExtras(android.content.Intent intent)
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JMap<jni.JString, jni.JObject> getIntentExtras(
+    Intent intent,
+  ) {
+    return const jni.JMapType(jni.JStringType(), jni.JObjectType())
+        .fromRef(_getIntentExtras(reference, intent.reference).object);
+  }
+
   static final _new0 = jniLookup<
               ffi
               .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
@@ -10528,6 +10546,21 @@ class TheLastUtils extends jni.JObject {
   ) {
     return _isBluetoothDeviceConnected(bluetoothDevice.reference).boolean;
   }
+
+  static final _getIntentExtras = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "TheLastUtils__getIntentExtras")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: static public final java.util.Map getIntentExtras(android.content.Intent intent)
+  /// The returned object must be released after use, by calling the [release] method.
+  static jni.JMap<jni.JString, jni.JObject> getIntentExtras(
+    Intent intent,
+  ) {
+    return const jni.JMapType(jni.JStringType(), jni.JObjectType())
+        .fromRef(_getIntentExtras(intent.reference).object);
+  }
 }
 
 final class $TheLastUtilsType extends jni.JObjType<TheLastUtils> {
@@ -10552,5 +10585,227 @@ final class $TheLastUtilsType extends jni.JObjType<TheLastUtils> {
   bool operator ==(Object other) {
     return other.runtimeType == ($TheLastUtilsType) &&
         other is $TheLastUtilsType;
+  }
+}
+
+/// from: com.lastgimbus.the.lastbluetooth.BroadcastReceiverInterface
+class BroadcastReceiverInterface extends jni.JObject {
+  @override
+  late final jni.JObjType<BroadcastReceiverInterface> $type = type;
+
+  BroadcastReceiverInterface.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $BroadcastReceiverInterfaceType();
+  static final _onReceive = jniLookup<
+              ffi.NativeFunction<
+                  jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                      ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>>(
+          "BroadcastReceiverInterface__onReceive")
+      .asFunction<
+          jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>();
+
+  /// from: public abstract void onReceive(android.content.Context context, android.content.Intent intent)
+  void onReceive(
+    Context context,
+    Intent intent,
+  ) {
+    return _onReceive(reference, context.reference, intent.reference).check();
+  }
+
+  /// Maps a specific port to the implemented interface.
+  static final Map<int, $BroadcastReceiverInterfaceImpl> _$impls = {};
+  ReceivePort? _$p;
+
+  static jni.JObjectPtr _$invoke(
+    int port,
+    jni.JObjectPtr descriptor,
+    jni.JObjectPtr args,
+  ) {
+    return _$invokeMethod(
+      port,
+      $MethodInvocation.fromAddresses(
+        0,
+        descriptor.address,
+        args.address,
+      ),
+    );
+  }
+
+  static final ffi.Pointer<
+          ffi.NativeFunction<
+              jni.JObjectPtr Function(
+                  ffi.Uint64, jni.JObjectPtr, jni.JObjectPtr)>>
+      _$invokePointer = ffi.Pointer.fromFunction(_$invoke);
+
+  static ffi.Pointer<ffi.Void> _$invokeMethod(
+    int $p,
+    $MethodInvocation $i,
+  ) {
+    try {
+      final $d = $i.methodDescriptor.toDartString(releaseOriginal: true);
+      final $a = $i.args;
+      if ($d ==
+          r"onReceive(Landroid/content/Context;Landroid/content/Intent;)V") {
+        _$impls[$p]!.onReceive(
+          $a[0].castTo(const $ContextType(), releaseOriginal: true),
+          $a[1].castTo(const $IntentType(), releaseOriginal: true),
+        );
+        return jni.nullptr;
+      }
+    } catch (e) {
+      return ProtectedJniExtensions.newDartException(e.toString());
+    }
+    return jni.nullptr;
+  }
+
+  factory BroadcastReceiverInterface.implement(
+    $BroadcastReceiverInterfaceImpl $impl,
+  ) {
+    final $p = ReceivePort();
+    final $x = BroadcastReceiverInterface.fromRef(
+      ProtectedJniExtensions.newPortProxy(
+        r"com.lastgimbus.the.lastbluetooth.BroadcastReceiverInterface",
+        $p,
+        _$invokePointer,
+      ),
+    ).._$p = $p;
+    final $a = $p.sendPort.nativePort;
+    _$impls[$a] = $impl;
+    $p.listen(($m) {
+      if ($m == null) {
+        _$impls.remove($p.sendPort.nativePort);
+        $p.close();
+        return;
+      }
+      final $i = $MethodInvocation.fromMessage($m as List<dynamic>);
+      final $r = _$invokeMethod($p.sendPort.nativePort, $i);
+      ProtectedJniExtensions.returnResult($i.result, $r);
+    });
+    return $x;
+  }
+}
+
+abstract class $BroadcastReceiverInterfaceImpl {
+  factory $BroadcastReceiverInterfaceImpl({
+    required void Function(Context context, Intent intent) onReceive,
+  }) = _$BroadcastReceiverInterfaceImpl;
+
+  void onReceive(Context context, Intent intent);
+}
+
+class _$BroadcastReceiverInterfaceImpl
+    implements $BroadcastReceiverInterfaceImpl {
+  _$BroadcastReceiverInterfaceImpl({
+    required void Function(Context context, Intent intent) onReceive,
+  }) : _onReceive = onReceive;
+
+  final void Function(Context context, Intent intent) _onReceive;
+
+  void onReceive(Context context, Intent intent) {
+    return _onReceive(context, intent);
+  }
+}
+
+final class $BroadcastReceiverInterfaceType
+    extends jni.JObjType<BroadcastReceiverInterface> {
+  const $BroadcastReceiverInterfaceType();
+
+  @override
+  String get signature =>
+      r"Lcom/lastgimbus/the/lastbluetooth/BroadcastReceiverInterface;";
+
+  @override
+  BroadcastReceiverInterface fromRef(jni.JObjectPtr ref) =>
+      BroadcastReceiverInterface.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($BroadcastReceiverInterfaceType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($BroadcastReceiverInterfaceType) &&
+        other is $BroadcastReceiverInterfaceType;
+  }
+}
+
+/// from: com.lastgimbus.the.lastbluetooth.TheLastBroadcastReceiver
+class TheLastBroadcastReceiver extends BroadcastReceiver {
+  @override
+  late final jni.JObjType<TheLastBroadcastReceiver> $type = type;
+
+  TheLastBroadcastReceiver.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $TheLastBroadcastReceiverType();
+  static final _new1 = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "TheLastBroadcastReceiver__new1")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void <init>(com.lastgimbus.the.lastbluetooth.BroadcastReceiverInterface broadcastReceiverInterface)
+  /// The returned object must be released after use, by calling the [release] method.
+  factory TheLastBroadcastReceiver.new1(
+    BroadcastReceiverInterface broadcastReceiverInterface,
+  ) {
+    return TheLastBroadcastReceiver.fromRef(
+        _new1(broadcastReceiverInterface.reference).object);
+  }
+
+  static final _onReceive = jniLookup<
+              ffi.NativeFunction<
+                  jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                      ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>>(
+          "TheLastBroadcastReceiver__onReceive")
+      .asFunction<
+          jni.JniResult Function(ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void onReceive(android.content.Context context, android.content.Intent intent)
+  void onReceive(
+    Context context,
+    Intent intent,
+  ) {
+    return _onReceive(reference, context.reference, intent.reference).check();
+  }
+}
+
+final class $TheLastBroadcastReceiverType
+    extends jni.JObjType<TheLastBroadcastReceiver> {
+  const $TheLastBroadcastReceiverType();
+
+  @override
+  String get signature =>
+      r"Lcom/lastgimbus/the/lastbluetooth/TheLastBroadcastReceiver;";
+
+  @override
+  TheLastBroadcastReceiver fromRef(jni.JObjectPtr ref) =>
+      TheLastBroadcastReceiver.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const $BroadcastReceiverType();
+
+  @override
+  final superCount = 2;
+
+  @override
+  int get hashCode => ($TheLastBroadcastReceiverType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($TheLastBroadcastReceiverType) &&
+        other is $TheLastBroadcastReceiverType;
   }
 }

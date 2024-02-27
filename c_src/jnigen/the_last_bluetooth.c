@@ -8560,6 +8560,26 @@ JniResult TheLastUtils_Companion__isBluetoothDeviceConnected(
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
 }
 
+jmethodID _m_TheLastUtils_Companion__getIntentExtras = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils_Companion__getIntentExtras(jobject self_,
+                                                  jobject intent) {
+  load_env();
+  load_class_global_ref(
+      &_c_TheLastUtils_Companion,
+      "com/lastgimbus/the/lastbluetooth/TheLastUtils$Companion");
+  if (_c_TheLastUtils_Companion == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_TheLastUtils_Companion,
+              &_m_TheLastUtils_Companion__getIntentExtras, "getIntentExtras",
+              "(Landroid/content/Intent;)Ljava/util/Map;");
+  if (_m_TheLastUtils_Companion__getIntentExtras == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallObjectMethod(
+      jniEnv, self_, _m_TheLastUtils_Companion__getIntentExtras, intent);
+  return to_global_ref_result(_result);
+}
+
 jmethodID _m_TheLastUtils_Companion__new0 = NULL;
 FFI_PLUGIN_EXPORT
 JniResult TheLastUtils_Companion__new0(jobject defaultConstructorMarker) {
@@ -8617,6 +8637,24 @@ JniResult TheLastUtils__isBluetoothDeviceConnected(jobject bluetoothDevice) {
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
 }
 
+jmethodID _m_TheLastUtils__getIntentExtras = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils__getIntentExtras(jobject intent) {
+  load_env();
+  load_class_global_ref(&_c_TheLastUtils,
+                        "com/lastgimbus/the/lastbluetooth/TheLastUtils");
+  if (_c_TheLastUtils == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_TheLastUtils, &_m_TheLastUtils__getIntentExtras,
+                     "getIntentExtras",
+                     "(Landroid/content/Intent;)Ljava/util/Map;");
+  if (_m_TheLastUtils__getIntentExtras == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallStaticObjectMethod(
+      jniEnv, _c_TheLastUtils, _m_TheLastUtils__getIntentExtras, intent);
+  return to_global_ref_result(_result);
+}
+
 jfieldID _f_TheLastUtils__Companion = NULL;
 FFI_PLUGIN_EXPORT
 JniResult get_TheLastUtils__Companion() {
@@ -8631,4 +8669,72 @@ JniResult get_TheLastUtils__Companion() {
   jobject _result = (*jniEnv)->GetStaticObjectField(jniEnv, _c_TheLastUtils,
                                                     _f_TheLastUtils__Companion);
   return to_global_ref_result(_result);
+}
+
+// com.lastgimbus.the.lastbluetooth.BroadcastReceiverInterface
+jclass _c_BroadcastReceiverInterface = NULL;
+
+jmethodID _m_BroadcastReceiverInterface__onReceive = NULL;
+FFI_PLUGIN_EXPORT
+JniResult BroadcastReceiverInterface__onReceive(jobject self_,
+                                                jobject context,
+                                                jobject intent) {
+  load_env();
+  load_class_global_ref(
+      &_c_BroadcastReceiverInterface,
+      "com/lastgimbus/the/lastbluetooth/BroadcastReceiverInterface");
+  if (_c_BroadcastReceiverInterface == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_BroadcastReceiverInterface,
+              &_m_BroadcastReceiverInterface__onReceive, "onReceive",
+              "(Landroid/content/Context;Landroid/content/Intent;)V");
+  if (_m_BroadcastReceiverInterface__onReceive == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(
+      jniEnv, self_, _m_BroadcastReceiverInterface__onReceive, context, intent);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+// com.lastgimbus.the.lastbluetooth.TheLastBroadcastReceiver
+jclass _c_TheLastBroadcastReceiver = NULL;
+
+jmethodID _m_TheLastBroadcastReceiver__new1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastBroadcastReceiver__new1(jobject broadcastReceiverInterface) {
+  load_env();
+  load_class_global_ref(
+      &_c_TheLastBroadcastReceiver,
+      "com/lastgimbus/the/lastbluetooth/TheLastBroadcastReceiver");
+  if (_c_TheLastBroadcastReceiver == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(
+      _c_TheLastBroadcastReceiver, &_m_TheLastBroadcastReceiver__new1, "<init>",
+      "(Lcom/lastgimbus/the/lastbluetooth/BroadcastReceiverInterface;)V");
+  if (_m_TheLastBroadcastReceiver__new1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->NewObject(jniEnv, _c_TheLastBroadcastReceiver,
+                                         _m_TheLastBroadcastReceiver__new1,
+                                         broadcastReceiverInterface);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_TheLastBroadcastReceiver__onReceive = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastBroadcastReceiver__onReceive(jobject self_,
+                                              jobject context,
+                                              jobject intent) {
+  load_env();
+  load_class_global_ref(
+      &_c_TheLastBroadcastReceiver,
+      "com/lastgimbus/the/lastbluetooth/TheLastBroadcastReceiver");
+  if (_c_TheLastBroadcastReceiver == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_TheLastBroadcastReceiver,
+              &_m_TheLastBroadcastReceiver__onReceive, "onReceive",
+              "(Landroid/content/Context;Landroid/content/Intent;)V");
+  if (_m_TheLastBroadcastReceiver__onReceive == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(
+      jniEnv, self_, _m_TheLastBroadcastReceiver__onReceive, context, intent);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
 }

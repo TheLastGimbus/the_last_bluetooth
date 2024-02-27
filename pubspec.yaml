@@ -13,7 +13,6 @@ dependencies:
   plugin_platform_interface: ^2.1.7
 
   jni: ^0.7.2
-  flutter_broadcasts: '>=0.4.0 <1.0.0'
   rxdart: '>=0.25.0 <1.0.0'
   collection: '>=1.15.0 <2.0.0'
 

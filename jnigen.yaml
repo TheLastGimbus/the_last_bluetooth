@@ -24,3 +24,5 @@ classes:
   - 'android.content.Intent'
   - 'android.content.IntentFilter'
   - 'com.lastgimbus.the.lastbluetooth.TheLastUtils'
+  - 'com.lastgimbus.the.lastbluetooth.BroadcastReceiverInterface'
+  - 'com.lastgimbus.the.lastbluetooth.TheLastBroadcastReceiver'
