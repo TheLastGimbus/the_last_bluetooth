@@ -10595,6 +10595,23 @@ class TheLastUtils_Companion extends jni.JObject {
         .boolean;
   }
 
+  static final _bluetoothDeviceBatteryLevel = jniLookup<
+              ffi.NativeFunction<
+                  jni.JniResult Function(
+                      ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>>(
+          "TheLastUtils_Companion__bluetoothDeviceBatteryLevel")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public final int bluetoothDeviceBatteryLevel(android.bluetooth.BluetoothDevice bluetoothDevice)
+  int bluetoothDeviceBatteryLevel(
+    BluetoothDevice bluetoothDevice,
+  ) {
+    return _bluetoothDeviceBatteryLevel(reference, bluetoothDevice.reference)
+        .integer;
+  }
+
   static final _getIntentExtras = jniLookup<
               ffi.NativeFunction<
                   jni.JniResult Function(
@@ -10699,6 +10716,19 @@ class TheLastUtils extends jni.JObject {
     BluetoothDevice bluetoothDevice,
   ) {
     return _isBluetoothDeviceConnected(bluetoothDevice.reference).boolean;
+  }
+
+  static final _bluetoothDeviceBatteryLevel = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "TheLastUtils__bluetoothDeviceBatteryLevel")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: static public final int bluetoothDeviceBatteryLevel(android.bluetooth.BluetoothDevice bluetoothDevice)
+  static int bluetoothDeviceBatteryLevel(
+    BluetoothDevice bluetoothDevice,
+  ) {
+    return _bluetoothDeviceBatteryLevel(bluetoothDevice.reference).integer;
   }
 
   static final _getIntentExtras = jniLookup<

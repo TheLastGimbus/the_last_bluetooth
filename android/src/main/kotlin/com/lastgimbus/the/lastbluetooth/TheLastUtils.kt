@@ -19,6 +19,15 @@ class TheLastUtils() {
         }
 
         @JvmStatic
+        fun bluetoothDeviceBatteryLevel(device: BluetoothDevice): Int {
+            return try {
+                device.javaClass.getMethod("getBatteryLevel").invoke(device) as? Int? ?: -1
+            } catch (e: Throwable) {
+                -1
+            }
+        }
+
+        @JvmStatic
         fun getIntentExtras(intent: Intent): Map<String, Any?> {
             val extras = intent.extras
             val map = mutableMapOf<String, Any?>()

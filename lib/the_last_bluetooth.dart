@@ -1,3 +1,4 @@
+// ignore_for_file: constant_identifier_names
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -8,6 +9,13 @@ import 'package:the_last_bluetooth/src/android_bluetooth.g.dart' as android;
 import 'src/bluetooth_device.dart';
 
 class TheLastBluetooth {
+  // secret commands 😋
+  // ohhhh i fucking love android
+  static const _ACTION_BATTERY_LEVEL_CHANGED =
+      "android.bluetooth.device.action.BATTERY_LEVEL_CHANGED";
+  static const _EXTRA_BATTERY_LEVEL =
+      "android.bluetooth.device.extra.BATTERY_LEVEL";
+
   static final TheLastBluetooth _instance = TheLastBluetooth._();
 
   static TheLastBluetooth get instance => _instance;
@@ -41,6 +49,8 @@ class TheLastBluetooth {
           _adapter.getBondedDevices().map(
             (dev) {
               final uuids = dev.getUuids();
+              final battery =
+                  android.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
               return _BluetoothDevice(
                 dev.getAddress().toDString(),
                 nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
@@ -54,6 +64,9 @@ class TheLastBluetooth {
                       (i) => uuids[i].toString(),
                     ).toSet(),
                   ),
+                batteryLevelCtrl: battery >= 0
+                    ? BehaviorSubject.seeded(battery)
+                    : BehaviorSubject(),
               );
             },
           ).toSet(),
@@ -66,6 +79,7 @@ class TheLastBluetooth {
           if (!dev.uuidsCompleter.isCompleted) {
             dev.uuidsCompleter.complete(<String>{});
           }
+          dev.batteryLevelCtrl.close();
         });
         _pairedDevicesCtrl.add(<_BluetoothDevice>{});
       }
@@ -87,6 +101,7 @@ class TheLastBluetooth {
       android.BluetoothDevice.ACTION_ACL_DISCONNECTED,
       android.BluetoothDevice.ACTION_NAME_CHANGED,
       android.BluetoothDevice.ACTION_ALIAS_CHANGED,
+      _ACTION_BATTERY_LEVEL_CHANGED,
     ]) {
       filter.addAction(action.toJString());
     }
@@ -125,6 +140,8 @@ class TheLastBluetooth {
         switch (bondState) {
           case android.BluetoothDevice.BOND_BONDED:
             final uuids = extraDev.dev.getUuids();
+            final battery =
+                android.TheLastUtils.bluetoothDeviceBatteryLevel(extraDev.dev);
             _pairedDevicesCtrl.add(
               _pairedDevicesCtrl.value
                 ..add(
@@ -144,6 +161,9 @@ class TheLastBluetooth {
                           (i) => uuids[i].toString(),
                         ).toSet(),
                       ),
+                    batteryLevelCtrl: battery >= 0
+                        ? BehaviorSubject.seeded(battery)
+                        : BehaviorSubject(),
                   ),
                 ),
             );
@@ -159,6 +179,7 @@ class TheLastBluetooth {
                     if (!dev.uuidsCompleter.isCompleted) {
                       dev.uuidsCompleter.complete(<String>{});
                     }
+                    dev.batteryLevelCtrl.close();
                     return true;
                   } else {
                     return false;
@@ -199,6 +220,16 @@ class TheLastBluetooth {
             ?.aliasCtrl
             .add(extraDev.dev.getAlias().toDString());
         break;
+      case _ACTION_BATTERY_LEVEL_CHANGED:
+        final extraDev = getExtraDev(intent);
+        final battery =
+            intent.getIntExtra(_EXTRA_BATTERY_LEVEL.toJString(), -1);
+        if (battery >= 0) {
+          _pairedDevicesCtrl.value
+              .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
+              ?.batteryLevelCtrl
+              .addDistinct(battery);
+        }
     }
   }
 
@@ -218,6 +249,7 @@ class _BluetoothDevice implements BluetoothDevice {
     required this.aliasCtrl,
     required this.isConnectedCtrl,
     required this.uuidsCompleter,
+    required this.batteryLevelCtrl,
   });
 
   /// Devices that randomize their MACs are currently out of scope of this
@@ -230,6 +262,7 @@ class _BluetoothDevice implements BluetoothDevice {
   final BehaviorSubject<String> aliasCtrl;
   final BehaviorSubject<bool> isConnectedCtrl;
   final Completer<Set<String>> uuidsCompleter;
+  final BehaviorSubject<int> batteryLevelCtrl;
 
   @override
   ValueStream<String> get name => nameCtrl.stream;
@@ -245,10 +278,21 @@ class _BluetoothDevice implements BluetoothDevice {
 
   @override
   Future<Set<String>> get uuids => uuidsCompleter.future;
+
+  @override
+  ValueStream<int> get battery => batteryLevelCtrl.stream;
 }
 
 extension on JString {
   /// just with [releaseOriginal] true by default
   String toDString({bool releaseOriginal = true}) =>
       toDartString(releaseOriginal: releaseOriginal);
+}
+
+extension TheLastSubject<T> on BehaviorSubject<T> {
+  void addDistinct(T value) {
+    if (valueOrNull != value) {
+      add(value);
+    }
+  }
 }

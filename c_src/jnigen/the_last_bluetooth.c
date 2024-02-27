@@ -8704,6 +8704,29 @@ JniResult TheLastUtils_Companion__isBluetoothDeviceConnected(
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
 }
 
+jmethodID _m_TheLastUtils_Companion__bluetoothDeviceBatteryLevel = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils_Companion__bluetoothDeviceBatteryLevel(
+    jobject self_,
+    jobject bluetoothDevice) {
+  load_env();
+  load_class_global_ref(
+      &_c_TheLastUtils_Companion,
+      "com/lastgimbus/the/lastbluetooth/TheLastUtils$Companion");
+  if (_c_TheLastUtils_Companion == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_TheLastUtils_Companion,
+              &_m_TheLastUtils_Companion__bluetoothDeviceBatteryLevel,
+              "bluetoothDeviceBatteryLevel",
+              "(Landroid/bluetooth/BluetoothDevice;)I");
+  if (_m_TheLastUtils_Companion__bluetoothDeviceBatteryLevel == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result = (*jniEnv)->CallIntMethod(
+      jniEnv, self_, _m_TheLastUtils_Companion__bluetoothDeviceBatteryLevel,
+      bluetoothDevice);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
 jmethodID _m_TheLastUtils_Companion__getIntentExtras = NULL;
 FFI_PLUGIN_EXPORT
 JniResult TheLastUtils_Companion__getIntentExtras(jobject self_,
@@ -8779,6 +8802,25 @@ JniResult TheLastUtils__isBluetoothDeviceConnected(jobject bluetoothDevice) {
       jniEnv, _c_TheLastUtils, _m_TheLastUtils__isBluetoothDeviceConnected,
       bluetoothDevice);
   return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_TheLastUtils__bluetoothDeviceBatteryLevel = NULL;
+FFI_PLUGIN_EXPORT
+JniResult TheLastUtils__bluetoothDeviceBatteryLevel(jobject bluetoothDevice) {
+  load_env();
+  load_class_global_ref(&_c_TheLastUtils,
+                        "com/lastgimbus/the/lastbluetooth/TheLastUtils");
+  if (_c_TheLastUtils == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(
+      _c_TheLastUtils, &_m_TheLastUtils__bluetoothDeviceBatteryLevel,
+      "bluetoothDeviceBatteryLevel", "(Landroid/bluetooth/BluetoothDevice;)I");
+  if (_m_TheLastUtils__bluetoothDeviceBatteryLevel == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result = (*jniEnv)->CallStaticIntMethod(
+      jniEnv, _c_TheLastUtils, _m_TheLastUtils__bluetoothDeviceBatteryLevel,
+      bluetoothDevice);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
 }
 
 jmethodID _m_TheLastUtils__getIntentExtras = NULL;

@@ -61,12 +61,6 @@ class _MyAppState extends State<MyApp> {
                                       Row(
                                         children: [
                                           StreamBuilder(
-                                            stream: dev.name,
-                                            builder: (_, snap) =>
-                                                Text(snap.data ?? 'null'),
-                                          ),
-                                          const Text(' aka '),
-                                          StreamBuilder(
                                             stream: dev.alias,
                                             builder: (_, snap) =>
                                                 Text(snap.data ?? 'null'),
@@ -78,6 +72,14 @@ class _MyAppState extends State<MyApp> {
                                                 snap.data != null
                                                     ? (snap.data! ? '✅' : '❌')
                                                     : 'null'),
+                                          ),
+                                          const Text(' '),
+                                          StreamBuilder(
+                                            stream: dev.battery,
+                                            builder: (_, snap) => Text(
+                                                snap.data != null
+                                                    ? '🔋${snap.data}%'
+                                                    : ''),
                                           ),
                                         ],
                                       ),

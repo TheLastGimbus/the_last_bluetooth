@@ -10,4 +10,6 @@ abstract class BluetoothDevice {
   ValueStream<bool> get isConnected;
 
   Future<Set<String>> get uuids;
+
+  ValueStream<int> get battery;
 }
