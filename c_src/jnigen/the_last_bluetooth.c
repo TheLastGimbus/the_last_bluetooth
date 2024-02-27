@@ -15,6 +15,606 @@ void setJniGetters(JniContext* (*cg)(void), JNIEnv* (*eg)(void)) {
   env_getter = eg;
 }
 
+// java.util.UUID
+jclass _c_UUID = NULL;
+
+jmethodID _m_UUID__new0 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__new0(int64_t j, int64_t j1) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__new0, "<init>", "(JJ)V");
+  if (_m_UUID__new0 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->NewObject(jniEnv, _c_UUID, _m_UUID__new0, j, j1);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_UUID__randomUUID = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__randomUUID() {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_UUID, &_m_UUID__randomUUID, "randomUUID",
+                     "()Ljava/util/UUID;");
+  if (_m_UUID__randomUUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->CallStaticObjectMethod(jniEnv, _c_UUID, _m_UUID__randomUUID);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_UUID__nameUUIDFromBytes = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__nameUUIDFromBytes(jobject bs) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_UUID, &_m_UUID__nameUUIDFromBytes, "nameUUIDFromBytes",
+                     "([B)Ljava/util/UUID;");
+  if (_m_UUID__nameUUIDFromBytes == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallStaticObjectMethod(
+      jniEnv, _c_UUID, _m_UUID__nameUUIDFromBytes, bs);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_UUID__fromString = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__fromString(jobject string) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_UUID, &_m_UUID__fromString, "fromString",
+                     "(Ljava/lang/String;)Ljava/util/UUID;");
+  if (_m_UUID__fromString == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallStaticObjectMethod(
+      jniEnv, _c_UUID, _m_UUID__fromString, string);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_UUID__getLeastSignificantBits = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__getLeastSignificantBits(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__getLeastSignificantBits,
+              "getLeastSignificantBits", "()J");
+  if (_m_UUID__getLeastSignificantBits == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int64_t _result = (*jniEnv)->CallLongMethod(jniEnv, self_,
+                                              _m_UUID__getLeastSignificantBits);
+  return (JniResult){.value = {.j = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__getMostSignificantBits = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__getMostSignificantBits(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__getMostSignificantBits,
+              "getMostSignificantBits", "()J");
+  if (_m_UUID__getMostSignificantBits == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int64_t _result =
+      (*jniEnv)->CallLongMethod(jniEnv, self_, _m_UUID__getMostSignificantBits);
+  return (JniResult){.value = {.j = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__version = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__version(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__version, "version", "()I");
+  if (_m_UUID__version == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result = (*jniEnv)->CallIntMethod(jniEnv, self_, _m_UUID__version);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__variant = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__variant(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__variant, "variant", "()I");
+  if (_m_UUID__variant == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result = (*jniEnv)->CallIntMethod(jniEnv, self_, _m_UUID__variant);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__timestamp = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__timestamp(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__timestamp, "timestamp", "()J");
+  if (_m_UUID__timestamp == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int64_t _result =
+      (*jniEnv)->CallLongMethod(jniEnv, self_, _m_UUID__timestamp);
+  return (JniResult){.value = {.j = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__clockSequence = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__clockSequence(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__clockSequence, "clockSequence", "()I");
+  if (_m_UUID__clockSequence == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_UUID__clockSequence);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__node = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__node(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__node, "node", "()J");
+  if (_m_UUID__node == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int64_t _result = (*jniEnv)->CallLongMethod(jniEnv, self_, _m_UUID__node);
+  return (JniResult){.value = {.j = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__toString1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__toString1(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__toString1, "toString", "()Ljava/lang/String;");
+  if (_m_UUID__toString1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->CallObjectMethod(jniEnv, self_, _m_UUID__toString1);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_UUID__hashCode1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__hashCode1(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__hashCode1, "hashCode", "()I");
+  if (_m_UUID__hashCode1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result = (*jniEnv)->CallIntMethod(jniEnv, self_, _m_UUID__hashCode1);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__equals1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__equals1(jobject self_, jobject object) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__equals1, "equals", "(Ljava/lang/Object;)Z");
+  if (_m_UUID__equals1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result =
+      (*jniEnv)->CallBooleanMethod(jniEnv, self_, _m_UUID__equals1, object);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__compareTo = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__compareTo(jobject self_, jobject uUID) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__compareTo, "compareTo", "(Ljava/util/UUID;)I");
+  if (_m_UUID__compareTo == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_UUID__compareTo, uUID);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_UUID__compareTo1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult UUID__compareTo1(jobject self_, jobject object) {
+  load_env();
+  load_class_global_ref(&_c_UUID, "java/util/UUID");
+  if (_c_UUID == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_UUID, &_m_UUID__compareTo1, "compareTo",
+              "(Ljava/lang/Object;)I");
+  if (_m_UUID__compareTo1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_UUID__compareTo1, object);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+// java.io.InputStream
+jclass _c_InputStream = NULL;
+
+jmethodID _m_InputStream__new0 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__new0() {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__new0, "<init>", "()V");
+  if (_m_InputStream__new0 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->NewObject(jniEnv, _c_InputStream, _m_InputStream__new0);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_InputStream__nullInputStream = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__nullInputStream() {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_InputStream, &_m_InputStream__nullInputStream,
+                     "nullInputStream", "()Ljava/io/InputStream;");
+  if (_m_InputStream__nullInputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallStaticObjectMethod(
+      jniEnv, _c_InputStream, _m_InputStream__nullInputStream);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_InputStream__read = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__read(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__read, "read", "()I");
+  if (_m_InputStream__read == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_InputStream__read);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__read1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__read1(jobject self_, jobject bs) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__read1, "read", "([B)I");
+  if (_m_InputStream__read1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_InputStream__read1, bs);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__read2 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__read2(jobject self_, jobject bs, int32_t i, int32_t i1) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__read2, "read", "([BII)I");
+  if (_m_InputStream__read2 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_InputStream__read2, bs, i, i1);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__readAllBytes = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__readAllBytes(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__readAllBytes, "readAllBytes",
+              "()[B");
+  if (_m_InputStream__readAllBytes == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->CallObjectMethod(jniEnv, self_, _m_InputStream__readAllBytes);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_InputStream__readNBytes = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__readNBytes(jobject self_, int32_t i) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__readNBytes, "readNBytes",
+              "(I)[B");
+  if (_m_InputStream__readNBytes == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->CallObjectMethod(jniEnv, self_, _m_InputStream__readNBytes, i);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_InputStream__readNBytes1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__readNBytes1(jobject self_,
+                                   jobject bs,
+                                   int32_t i,
+                                   int32_t i1) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__readNBytes1, "readNBytes",
+              "([BII)I");
+  if (_m_InputStream__readNBytes1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result = (*jniEnv)->CallIntMethod(
+      jniEnv, self_, _m_InputStream__readNBytes1, bs, i, i1);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__skip = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__skip(jobject self_, int64_t j) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__skip, "skip", "(J)J");
+  if (_m_InputStream__skip == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int64_t _result =
+      (*jniEnv)->CallLongMethod(jniEnv, self_, _m_InputStream__skip, j);
+  return (JniResult){.value = {.j = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__skipNBytes = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__skipNBytes(jobject self_, int64_t j) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__skipNBytes, "skipNBytes",
+              "(J)V");
+  if (_m_InputStream__skipNBytes == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_InputStream__skipNBytes, j);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__available = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__available(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__available, "available", "()I");
+  if (_m_InputStream__available == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int32_t _result =
+      (*jniEnv)->CallIntMethod(jniEnv, self_, _m_InputStream__available);
+  return (JniResult){.value = {.i = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__close = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__close(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__close, "close", "()V");
+  if (_m_InputStream__close == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_InputStream__close);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__mark = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__mark(jobject self_, int32_t i) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__mark, "mark", "(I)V");
+  if (_m_InputStream__mark == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_InputStream__mark, i);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__reset = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__reset(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__reset, "reset", "()V");
+  if (_m_InputStream__reset == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_InputStream__reset);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__markSupported = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__markSupported(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__markSupported, "markSupported",
+              "()Z");
+  if (_m_InputStream__markSupported == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  uint8_t _result = (*jniEnv)->CallBooleanMethod(jniEnv, self_,
+                                                 _m_InputStream__markSupported);
+  return (JniResult){.value = {.z = _result}, .exception = check_exception()};
+}
+
+jmethodID _m_InputStream__transferTo = NULL;
+FFI_PLUGIN_EXPORT
+JniResult InputStream__transferTo(jobject self_, jobject outputStream) {
+  load_env();
+  load_class_global_ref(&_c_InputStream, "java/io/InputStream");
+  if (_c_InputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_InputStream, &_m_InputStream__transferTo, "transferTo",
+              "(Ljava/io/OutputStream;)J");
+  if (_m_InputStream__transferTo == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  int64_t _result = (*jniEnv)->CallLongMethod(
+      jniEnv, self_, _m_InputStream__transferTo, outputStream);
+  return (JniResult){.value = {.j = _result}, .exception = check_exception()};
+}
+
+// java.io.OutputStream
+jclass _c_OutputStream = NULL;
+
+jmethodID _m_OutputStream__new0 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult OutputStream__new0() {
+  load_env();
+  load_class_global_ref(&_c_OutputStream, "java/io/OutputStream");
+  if (_c_OutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_OutputStream, &_m_OutputStream__new0, "<init>", "()V");
+  if (_m_OutputStream__new0 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result =
+      (*jniEnv)->NewObject(jniEnv, _c_OutputStream, _m_OutputStream__new0);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_OutputStream__nullOutputStream = NULL;
+FFI_PLUGIN_EXPORT
+JniResult OutputStream__nullOutputStream() {
+  load_env();
+  load_class_global_ref(&_c_OutputStream, "java/io/OutputStream");
+  if (_c_OutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_static_method(_c_OutputStream, &_m_OutputStream__nullOutputStream,
+                     "nullOutputStream", "()Ljava/io/OutputStream;");
+  if (_m_OutputStream__nullOutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  jobject _result = (*jniEnv)->CallStaticObjectMethod(
+      jniEnv, _c_OutputStream, _m_OutputStream__nullOutputStream);
+  return to_global_ref_result(_result);
+}
+
+jmethodID _m_OutputStream__write = NULL;
+FFI_PLUGIN_EXPORT
+JniResult OutputStream__write(jobject self_, int32_t i) {
+  load_env();
+  load_class_global_ref(&_c_OutputStream, "java/io/OutputStream");
+  if (_c_OutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_OutputStream, &_m_OutputStream__write, "write", "(I)V");
+  if (_m_OutputStream__write == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_OutputStream__write, i);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_OutputStream__write1 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult OutputStream__write1(jobject self_, jobject bs) {
+  load_env();
+  load_class_global_ref(&_c_OutputStream, "java/io/OutputStream");
+  if (_c_OutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_OutputStream, &_m_OutputStream__write1, "write", "([B)V");
+  if (_m_OutputStream__write1 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_OutputStream__write1, bs);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_OutputStream__write2 = NULL;
+FFI_PLUGIN_EXPORT
+JniResult OutputStream__write2(jobject self_,
+                               jobject bs,
+                               int32_t i,
+                               int32_t i1) {
+  load_env();
+  load_class_global_ref(&_c_OutputStream, "java/io/OutputStream");
+  if (_c_OutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_OutputStream, &_m_OutputStream__write2, "write", "([BII)V");
+  if (_m_OutputStream__write2 == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_OutputStream__write2, bs, i, i1);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_OutputStream__flush = NULL;
+FFI_PLUGIN_EXPORT
+JniResult OutputStream__flush(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_OutputStream, "java/io/OutputStream");
+  if (_c_OutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_OutputStream, &_m_OutputStream__flush, "flush", "()V");
+  if (_m_OutputStream__flush == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_OutputStream__flush);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
+jmethodID _m_OutputStream__close = NULL;
+FFI_PLUGIN_EXPORT
+JniResult OutputStream__close(jobject self_) {
+  load_env();
+  load_class_global_ref(&_c_OutputStream, "java/io/OutputStream");
+  if (_c_OutputStream == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  load_method(_c_OutputStream, &_m_OutputStream__close, "close", "()V");
+  if (_m_OutputStream__close == NULL)
+    return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+  (*jniEnv)->CallVoidMethod(jniEnv, self_, _m_OutputStream__close);
+  return (JniResult){.value = {.j = 0}, .exception = check_exception()};
+}
+
 // android.bluetooth.BluetoothAdapter$LeScanCallback
 jclass _c_BluetoothAdapter_LeScanCallback = NULL;
 

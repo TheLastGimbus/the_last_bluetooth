@@ -1,4 +1,5 @@
 import 'package:bluetooth_identifiers/bluetooth_identifiers.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';

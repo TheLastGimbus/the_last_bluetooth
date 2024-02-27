@@ -26,6 +26,611 @@ import "package:jni/jni.dart" as jni;
 final ffi.Pointer<T> Function<T extends ffi.NativeType>(String sym) jniLookup =
     ProtectedJniExtensions.initGeneratedLibrary("the_last_bluetooth");
 
+/// from: java.util.UUID
+class UUID extends jni.JObject {
+  @override
+  late final jni.JObjType<UUID> $type = type;
+
+  UUID.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $UUIDType();
+  static final _new0 = jniLookup<
+              ffi.NativeFunction<jni.JniResult Function(ffi.Int64, ffi.Int64)>>(
+          "UUID__new0")
+      .asFunction<jni.JniResult Function(int, int)>();
+
+  /// from: public void <init>(long j, long j1)
+  /// The returned object must be released after use, by calling the [release] method.
+  factory UUID(
+    int j,
+    int j1,
+  ) {
+    return UUID.fromRef(_new0(j, j1).object);
+  }
+
+  static final _randomUUID =
+      jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+              "UUID__randomUUID")
+          .asFunction<jni.JniResult Function()>();
+
+  /// from: static public java.util.UUID randomUUID()
+  /// The returned object must be released after use, by calling the [release] method.
+  static UUID randomUUID() {
+    return const $UUIDType().fromRef(_randomUUID().object);
+  }
+
+  static final _nameUUIDFromBytes = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "UUID__nameUUIDFromBytes")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: static public java.util.UUID nameUUIDFromBytes(byte[] bs)
+  /// The returned object must be released after use, by calling the [release] method.
+  static UUID nameUUIDFromBytes(
+    jni.JArray<jni.jbyte> bs,
+  ) {
+    return const $UUIDType().fromRef(_nameUUIDFromBytes(bs.reference).object);
+  }
+
+  static final _fromString = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "UUID__fromString")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: static public java.util.UUID fromString(java.lang.String string)
+  /// The returned object must be released after use, by calling the [release] method.
+  static UUID fromString(
+    jni.JString string,
+  ) {
+    return const $UUIDType().fromRef(_fromString(string.reference).object);
+  }
+
+  static final _getLeastSignificantBits = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "UUID__getLeastSignificantBits")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public long getLeastSignificantBits()
+  int getLeastSignificantBits() {
+    return _getLeastSignificantBits(reference).long;
+  }
+
+  static final _getMostSignificantBits = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "UUID__getMostSignificantBits")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public long getMostSignificantBits()
+  int getMostSignificantBits() {
+    return _getMostSignificantBits(reference).long;
+  }
+
+  static final _version = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>)>>("UUID__version")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int version()
+  int version() {
+    return _version(reference).integer;
+  }
+
+  static final _variant = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>)>>("UUID__variant")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int variant()
+  int variant() {
+    return _variant(reference).integer;
+  }
+
+  static final _timestamp = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>)>>("UUID__timestamp")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public long timestamp()
+  int timestamp() {
+    return _timestamp(reference).long;
+  }
+
+  static final _clockSequence = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "UUID__clockSequence")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int clockSequence()
+  int clockSequence() {
+    return _clockSequence(reference).integer;
+  }
+
+  static final _node = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>)>>("UUID__node")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public long node()
+  int node() {
+    return _node(reference).long;
+  }
+
+  static final _toString1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>)>>("UUID__toString1")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public java.lang.String toString()
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JString toString1() {
+    return const jni.JStringType().fromRef(_toString1(reference).object);
+  }
+
+  static final _hashCode1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>)>>("UUID__hashCode1")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int hashCode()
+  int hashCode1() {
+    return _hashCode1(reference).integer;
+  }
+
+  static final _equals1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("UUID__equals1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public boolean equals(java.lang.Object object)
+  bool equals1(
+    jni.JObject object,
+  ) {
+    return _equals1(reference, object.reference).boolean;
+  }
+
+  static final _compareTo = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("UUID__compareTo")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int compareTo(java.util.UUID uUID)
+  int compareTo(
+    UUID uUID,
+  ) {
+    return _compareTo(reference, uUID.reference).integer;
+  }
+
+  static final _compareTo1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("UUID__compareTo1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int compareTo(java.lang.Object object)
+  int compareTo1(
+    jni.JObject object,
+  ) {
+    return _compareTo1(reference, object.reference).integer;
+  }
+}
+
+final class $UUIDType extends jni.JObjType<UUID> {
+  const $UUIDType();
+
+  @override
+  String get signature => r"Ljava/util/UUID;";
+
+  @override
+  UUID fromRef(jni.JObjectPtr ref) => UUID.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($UUIDType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($UUIDType) && other is $UUIDType;
+  }
+}
+
+/// from: java.io.InputStream
+class InputStream extends jni.JObject {
+  @override
+  late final jni.JObjType<InputStream> $type = type;
+
+  InputStream.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $InputStreamType();
+  static final _new0 = jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+          "InputStream__new0")
+      .asFunction<jni.JniResult Function()>();
+
+  /// from: public void <init>()
+  /// The returned object must be released after use, by calling the [release] method.
+  factory InputStream() {
+    return InputStream.fromRef(_new0().object);
+  }
+
+  static final _nullInputStream =
+      jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+              "InputStream__nullInputStream")
+          .asFunction<jni.JniResult Function()>();
+
+  /// from: static public java.io.InputStream nullInputStream()
+  /// The returned object must be released after use, by calling the [release] method.
+  static InputStream nullInputStream() {
+    return const $InputStreamType().fromRef(_nullInputStream().object);
+  }
+
+  static final _read = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "InputStream__read")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public abstract int read()
+  int read() {
+    return _read(reference).integer;
+  }
+
+  static final _read1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("InputStream__read1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int read(byte[] bs)
+  int read1(
+    jni.JArray<jni.jbyte> bs,
+  ) {
+    return _read1(reference, bs.reference).integer;
+  }
+
+  static final _read2 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Int32,
+                  ffi.Int32)>>("InputStream__read2")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>, int, int)>();
+
+  /// from: public int read(byte[] bs, int i, int i1)
+  int read2(
+    jni.JArray<jni.jbyte> bs,
+    int i,
+    int i1,
+  ) {
+    return _read2(reference, bs.reference, i, i1).integer;
+  }
+
+  static final _readAllBytes = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "InputStream__readAllBytes")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public byte[] readAllBytes()
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JArray<jni.jbyte> readAllBytes() {
+    return const jni.JArrayType(jni.jbyteType())
+        .fromRef(_readAllBytes(reference).object);
+  }
+
+  static final _readNBytes = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>, ffi.Int32)>>("InputStream__readNBytes")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>, int)>();
+
+  /// from: public byte[] readNBytes(int i)
+  /// The returned object must be released after use, by calling the [release] method.
+  jni.JArray<jni.jbyte> readNBytes(
+    int i,
+  ) {
+    return const jni.JArrayType(jni.jbyteType())
+        .fromRef(_readNBytes(reference, i).object);
+  }
+
+  static final _readNBytes1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Int32,
+                  ffi.Int32)>>("InputStream__readNBytes1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>, int, int)>();
+
+  /// from: public int readNBytes(byte[] bs, int i, int i1)
+  int readNBytes1(
+    jni.JArray<jni.jbyte> bs,
+    int i,
+    int i1,
+  ) {
+    return _readNBytes1(reference, bs.reference, i, i1).integer;
+  }
+
+  static final _skip = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>, ffi.Int64)>>("InputStream__skip")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>, int)>();
+
+  /// from: public long skip(long j)
+  int skip(
+    int j,
+  ) {
+    return _skip(reference, j).long;
+  }
+
+  static final _skipNBytes = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>, ffi.Int64)>>("InputStream__skipNBytes")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>, int)>();
+
+  /// from: public void skipNBytes(long j)
+  void skipNBytes(
+    int j,
+  ) {
+    return _skipNBytes(reference, j).check();
+  }
+
+  static final _available = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "InputStream__available")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public int available()
+  int available() {
+    return _available(reference).integer;
+  }
+
+  static final _close = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "InputStream__close")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void close()
+  void close() {
+    return _close(reference).check();
+  }
+
+  static final _mark = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>, ffi.Int32)>>("InputStream__mark")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>, int)>();
+
+  /// from: public void mark(int i)
+  void mark(
+    int i,
+  ) {
+    return _mark(reference, i).check();
+  }
+
+  static final _reset = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "InputStream__reset")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void reset()
+  void reset() {
+    return _reset(reference).check();
+  }
+
+  static final _markSupported = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "InputStream__markSupported")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public boolean markSupported()
+  bool markSupported() {
+    return _markSupported(reference).boolean;
+  }
+
+  static final _transferTo = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("InputStream__transferTo")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public long transferTo(java.io.OutputStream outputStream)
+  int transferTo(
+    OutputStream outputStream,
+  ) {
+    return _transferTo(reference, outputStream.reference).long;
+  }
+}
+
+final class $InputStreamType extends jni.JObjType<InputStream> {
+  const $InputStreamType();
+
+  @override
+  String get signature => r"Ljava/io/InputStream;";
+
+  @override
+  InputStream fromRef(jni.JObjectPtr ref) => InputStream.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($InputStreamType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($InputStreamType) && other is $InputStreamType;
+  }
+}
+
+/// from: java.io.OutputStream
+class OutputStream extends jni.JObject {
+  @override
+  late final jni.JObjType<OutputStream> $type = type;
+
+  OutputStream.fromRef(
+    jni.JObjectPtr ref,
+  ) : super.fromRef(ref);
+
+  /// The type which includes information such as the signature of this class.
+  static const type = $OutputStreamType();
+  static final _new0 = jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+          "OutputStream__new0")
+      .asFunction<jni.JniResult Function()>();
+
+  /// from: public void <init>()
+  /// The returned object must be released after use, by calling the [release] method.
+  factory OutputStream() {
+    return OutputStream.fromRef(_new0().object);
+  }
+
+  static final _nullOutputStream =
+      jniLookup<ffi.NativeFunction<jni.JniResult Function()>>(
+              "OutputStream__nullOutputStream")
+          .asFunction<jni.JniResult Function()>();
+
+  /// from: static public java.io.OutputStream nullOutputStream()
+  /// The returned object must be released after use, by calling the [release] method.
+  static OutputStream nullOutputStream() {
+    return const $OutputStreamType().fromRef(_nullOutputStream().object);
+  }
+
+  static final _write = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>, ffi.Int32)>>("OutputStream__write")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>, int)>();
+
+  /// from: public abstract void write(int i)
+  void write(
+    int i,
+  ) {
+    return _write(reference, i).check();
+  }
+
+  static final _write1 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>)>>("OutputStream__write1")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void write(byte[] bs)
+  void write1(
+    jni.JArray<jni.jbyte> bs,
+  ) {
+    return _write1(reference, bs.reference).check();
+  }
+
+  static final _write2 = jniLookup<
+          ffi.NativeFunction<
+              jni.JniResult Function(
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Pointer<ffi.Void>,
+                  ffi.Int32,
+                  ffi.Int32)>>("OutputStream__write2")
+      .asFunction<
+          jni.JniResult Function(
+              ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>, int, int)>();
+
+  /// from: public void write(byte[] bs, int i, int i1)
+  void write2(
+    jni.JArray<jni.jbyte> bs,
+    int i,
+    int i1,
+  ) {
+    return _write2(reference, bs.reference, i, i1).check();
+  }
+
+  static final _flush = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "OutputStream__flush")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void flush()
+  void flush() {
+    return _flush(reference).check();
+  }
+
+  static final _close = jniLookup<
+              ffi
+              .NativeFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>>(
+          "OutputStream__close")
+      .asFunction<jni.JniResult Function(ffi.Pointer<ffi.Void>)>();
+
+  /// from: public void close()
+  void close() {
+    return _close(reference).check();
+  }
+}
+
+final class $OutputStreamType extends jni.JObjType<OutputStream> {
+  const $OutputStreamType();
+
+  @override
+  String get signature => r"Ljava/io/OutputStream;";
+
+  @override
+  OutputStream fromRef(jni.JObjectPtr ref) => OutputStream.fromRef(ref);
+
+  @override
+  jni.JObjType get superType => const jni.JObjectType();
+
+  @override
+  final superCount = 1;
+
+  @override
+  int get hashCode => ($OutputStreamType).hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == ($OutputStreamType) &&
+        other is $OutputStreamType;
+  }
+}
+
 /// from: android.bluetooth.BluetoothAdapter$LeScanCallback
 class BluetoothAdapter_LeScanCallback extends jni.JObject {
   @override
@@ -705,7 +1310,7 @@ class BluetoothAdapter extends jni.JObject {
   /// The returned object must be released after use, by calling the [release] method.
   jni.JObject listenUsingRfcommWithServiceRecord(
     jni.JString string,
-    jni.JObject uUID,
+    UUID uUID,
   ) {
     return const jni.JObjectType().fromRef(_listenUsingRfcommWithServiceRecord(
             reference, string.reference, uUID.reference)
@@ -725,7 +1330,7 @@ class BluetoothAdapter extends jni.JObject {
   /// The returned object must be released after use, by calling the [release] method.
   jni.JObject listenUsingInsecureRfcommWithServiceRecord(
     jni.JString string,
-    jni.JObject uUID,
+    UUID uUID,
   ) {
     return const jni.JObjectType().fromRef(
         _listenUsingInsecureRfcommWithServiceRecord(
@@ -823,7 +1428,7 @@ class BluetoothAdapter extends jni.JObject {
 
   /// from: public boolean startLeScan(java.util.UUID[] uUIDs, android.bluetooth.BluetoothAdapter$LeScanCallback leScanCallback)
   bool startLeScan1(
-    jni.JArray<jni.JObject> uUIDs,
+    jni.JArray<UUID> uUIDs,
     BluetoothAdapter_LeScanCallback leScanCallback,
   ) {
     return _startLeScan1(reference, uUIDs.reference, leScanCallback.reference)
@@ -1299,7 +1904,7 @@ class BluetoothDevice extends jni.JObject {
   /// from: public android.bluetooth.BluetoothSocket createRfcommSocketToServiceRecord(java.util.UUID uUID)
   /// The returned object must be released after use, by calling the [release] method.
   BluetoothSocket createRfcommSocketToServiceRecord(
-    jni.JObject uUID,
+    UUID uUID,
   ) {
     return const $BluetoothSocketType().fromRef(
         _createRfcommSocketToServiceRecord(reference, uUID.reference).object);
@@ -1317,7 +1922,7 @@ class BluetoothDevice extends jni.JObject {
   /// from: public android.bluetooth.BluetoothSocket createInsecureRfcommSocketToServiceRecord(java.util.UUID uUID)
   /// The returned object must be released after use, by calling the [release] method.
   BluetoothSocket createInsecureRfcommSocketToServiceRecord(
-    jni.JObject uUID,
+    UUID uUID,
   ) {
     return const $BluetoothSocketType().fromRef(
         _createInsecureRfcommSocketToServiceRecord(reference, uUID.reference)
@@ -1671,8 +2276,8 @@ class BluetoothSocket extends jni.JObject {
 
   /// from: public java.io.InputStream getInputStream()
   /// The returned object must be released after use, by calling the [release] method.
-  jni.JObject getInputStream() {
-    return const jni.JObjectType().fromRef(_getInputStream(reference).object);
+  InputStream getInputStream() {
+    return const $InputStreamType().fromRef(_getInputStream(reference).object);
   }
 
   static final _getOutputStream = jniLookup<
@@ -1683,8 +2288,9 @@ class BluetoothSocket extends jni.JObject {
 
   /// from: public java.io.OutputStream getOutputStream()
   /// The returned object must be released after use, by calling the [release] method.
-  jni.JObject getOutputStream() {
-    return const jni.JObjectType().fromRef(_getOutputStream(reference).object);
+  OutputStream getOutputStream() {
+    return const $OutputStreamType()
+        .fromRef(_getOutputStream(reference).object);
   }
 
   static final _isConnected = jniLookup<
@@ -3658,7 +4264,7 @@ class Context extends jni.JObject {
 
   /// from: public abstract void setWallpaper(java.io.InputStream inputStream)
   void setWallpaper1(
-    jni.JObject inputStream,
+    InputStream inputStream,
   ) {
     return _setWallpaper1(reference, inputStream.reference).check();
   }
@@ -10443,7 +11049,7 @@ class ParcelUuid extends jni.JObject {
   /// from: public void <init>(java.util.UUID uUID)
   /// The returned object must be released after use, by calling the [release] method.
   factory ParcelUuid(
-    jni.JObject uUID,
+    UUID uUID,
   ) {
     return ParcelUuid.fromRef(_new0(uUID.reference).object);
   }
@@ -10471,8 +11077,8 @@ class ParcelUuid extends jni.JObject {
 
   /// from: public java.util.UUID getUuid()
   /// The returned object must be released after use, by calling the [release] method.
-  jni.JObject getUuid() {
-    return const jni.JObjectType().fromRef(_getUuid(reference).object);
+  UUID getUuid() {
+    return const $UUIDType().fromRef(_getUuid(reference).object);
   }
 
   static final _toString1 = jniLookup<

@@ -34,6 +34,7 @@ dependencies:
     path: ../
   permission_handler: ^11.3.0
   bluetooth_identifiers: ^1.1.1
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

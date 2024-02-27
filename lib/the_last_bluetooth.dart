@@ -1,9 +1,11 @@
 // ignore_for_file: constant_identifier_names
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:jni/jni.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/src/android_bluetooth.g.dart' as jni;
 
 import 'src/bluetooth_device.dart';
@@ -193,6 +195,77 @@ class TheLastBluetooth {
     );
   }
 
+  StreamChannel<Uint8List> connectRfcomm(
+      BluetoothDevice device, String serviceUuid,
+      {bool force = false}) {
+    final ourDev =
+        _pairedDevicesCtrl.value.firstWhereOrNull((d) => d.mac == device.mac);
+    assert(ourDev?.isConnected.valueOrNull ?? false);
+    final toDevice = StreamController<Uint8List>();
+    final fromDevice = StreamController<Uint8List>.broadcast();
+    final jniDev = _adapter.getRemoteDevice(ourDev!.mac.toJString());
+    final socket = jniDev.createRfcommSocketToServiceRecord(
+      jni.UUID.fromString(serviceUuid.toJString()),
+    );
+    if (socket.isConnected()) {
+      if (force) {
+        socket.finalize();
+      } else {
+        throw "Device is already connected";
+      }
+    }
+    socket.connect();
+    final jniToDevice = socket.getOutputStream();
+    final jniFromDevice = socket.getInputStream();
+
+    toDevice.stream.listen((received) {
+      final buffer = JArray(const jbyteType(), received.length);
+      for (var i = 0; i < received.length; i++) {
+        buffer[i] = received[i];
+      }
+      // maybe: make new isolate for this some day
+      jniToDevice.write1(buffer);
+    }, onDone: () {
+      jniToDevice.close();
+      jniFromDevice.close();
+      socket.close();
+    });
+
+    late StreamSubscription loopSub;
+    loopSub = loopStream(() async {
+      try {
+        if (jniFromDevice.available() > 0) {
+          final buffer = JArray(const jbyteType(), 1024);
+          final read = jniFromDevice.read1(buffer);
+          if (read < 0) {
+            loopSub.cancel();
+            return;
+          }
+          fromDevice.add(
+            Uint8List.fromList(
+              List.generate(
+                buffer.length,
+                (i) => buffer[i],
+              ),
+            ),
+          );
+        } else {
+          // input lag will be *at most* 10ms
+          // Apple Vision Pro is 12ms
+          // we're good
+          await Future.delayed(const Duration(milliseconds: 10));
+        }
+      } catch (e) {
+        loopSub.cancel();
+        return;
+      }
+      return;
+    }).listen((_) {}, onDone: () {
+      fromDevice.close();
+    });
+    return StreamChannel(fromDevice.stream, toDevice.sink);
+  }
+
   // maybetodo: Make this real ??
   ValueStream<bool> get isAvailable => Stream.value(true).shareValue();
 
@@ -264,5 +337,13 @@ extension TheLastSubject<T> on BehaviorSubject<T> {
     if (valueOrNull != value) {
       add(value);
     }
+  }
+}
+
+// stream that does computation() as long as it's listened
+// when it's .close()d, it stops
+Stream<T> loopStream<T>(FutureOr<T> Function() computation) async* {
+  while (true) {
+    yield await computation();
   }
 }

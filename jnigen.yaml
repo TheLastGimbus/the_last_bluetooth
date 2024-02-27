@@ -15,6 +15,9 @@ enable_experiment:
   - interface_implementation
 
 classes:
+  - 'java.util.UUID'
+  - 'java.io.InputStream'
+  - 'java.io.OutputStream'
   - 'android.bluetooth.BluetoothAdapter'
   - 'android.bluetooth.BluetoothDevice'
   - 'android.bluetooth.BluetoothManager'
