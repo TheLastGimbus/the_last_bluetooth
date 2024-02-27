@@ -63,7 +63,9 @@ class TheLastBluetooth {
           dev.nameCtrl.close();
           dev.aliasCtrl.close();
           dev.isConnectedCtrl.close();
-          dev.uuidsCompleter.complete(<String>{});
+          if (!dev.uuidsCompleter.isCompleted) {
+            dev.uuidsCompleter.complete(<String>{});
+          }
         });
         _pairedDevicesCtrl.add(<_BluetoothDevice>{});
       }
@@ -154,7 +156,9 @@ class TheLastBluetooth {
                     dev.nameCtrl.close();
                     dev.aliasCtrl.close();
                     dev.isConnectedCtrl.close();
-                    dev.uuidsCompleter.complete(<String>{});
+                    if (!dev.uuidsCompleter.isCompleted) {
+                      dev.uuidsCompleter.complete(<String>{});
+                    }
                     return true;
                   } else {
                     return false;
