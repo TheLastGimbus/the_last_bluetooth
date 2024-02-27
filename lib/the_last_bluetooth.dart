@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:jni/jni.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:the_last_bluetooth/src/android_bluetooth.g.dart' as android;
+import 'package:the_last_bluetooth/src/android_bluetooth.g.dart' as jni;
 
 import 'src/bluetooth_device.dart';
 
@@ -20,8 +20,8 @@ class TheLastBluetooth {
 
   static TheLastBluetooth get instance => _instance;
 
-  late android.BluetoothManager _manager;
-  late android.BluetoothAdapter _adapter;
+  late jni.BluetoothManager _manager;
+  late jni.BluetoothAdapter _adapter;
 
   // Our streams for user:
   final _isEnabledCtrl = BehaviorSubject<bool>();
@@ -33,12 +33,10 @@ class TheLastBluetooth {
 
     // this is some init stuff - maybe move this to manual init() dispose() ?
     Jni.initDLApi();
-    final ctx = android.Context.fromRef(Jni.getCachedApplicationContext());
+    final ctx = jni.Context.fromRef(Jni.getCachedApplicationContext());
 
-    _manager = android.BluetoothManager.fromRef(
-      ctx
-          .getSystemService(android.Context.BLUETOOTH_SERVICE.toJString())
-          .reference,
+    _manager = jni.BluetoothManager.fromRef(
+      ctx.getSystemService(jni.Context.BLUETOOTH_SERVICE.toJString()).reference,
     );
     _adapter = _manager.getAdapter();
 
@@ -60,19 +58,19 @@ class TheLastBluetooth {
     _isEnabledCtrl.add(_adapter.isEnabled());
 
     // Register receiver:
-    final tlr = android.TheLastBroadcastReceiver.new1(
-      android.BroadcastReceiverInterface.implement(
-        android.$BroadcastReceiverInterfaceImpl(onReceive: onReceive),
+    final tlr = jni.TheLastBroadcastReceiver.new1(
+      jni.BroadcastReceiverInterface.implement(
+        jni.$BroadcastReceiverInterfaceImpl(onReceive: onReceive),
       ),
     );
-    final filter = android.IntentFilter();
+    final filter = jni.IntentFilter();
     for (final action in [
-      android.BluetoothAdapter.ACTION_STATE_CHANGED,
-      android.BluetoothDevice.ACTION_BOND_STATE_CHANGED,
-      android.BluetoothDevice.ACTION_ACL_CONNECTED,
-      android.BluetoothDevice.ACTION_ACL_DISCONNECTED,
-      android.BluetoothDevice.ACTION_NAME_CHANGED,
-      android.BluetoothDevice.ACTION_ALIAS_CHANGED,
+      jni.BluetoothAdapter.ACTION_STATE_CHANGED,
+      jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED,
+      jni.BluetoothDevice.ACTION_ACL_CONNECTED,
+      jni.BluetoothDevice.ACTION_ACL_DISCONNECTED,
+      jni.BluetoothDevice.ACTION_NAME_CHANGED,
+      jni.BluetoothDevice.ACTION_ALIAS_CHANGED,
       _ACTION_BATTERY_LEVEL_CHANGED,
     ]) {
       filter.addAction(action.toJString());
@@ -80,26 +78,26 @@ class TheLastBluetooth {
     ctx.registerReceiver(tlr, filter);
   }
 
-  void onReceive(android.Context context, android.Intent intent) {
+  void onReceive(jni.Context context, jni.Intent intent) {
     switch (intent.getAction().toDString()) {
-      case android.BluetoothAdapter.ACTION_STATE_CHANGED:
+      case jni.BluetoothAdapter.ACTION_STATE_CHANGED:
         final btState = intent.getIntExtra(
-            android.BluetoothAdapter.EXTRA_STATE.toJString(), -1);
+            jni.BluetoothAdapter.EXTRA_STATE.toJString(), -1);
         switch (btState) {
-          case android.BluetoothAdapter.STATE_ON:
+          case jni.BluetoothAdapter.STATE_ON:
             _isEnabledCtrl.add(true);
             break;
-          case android.BluetoothAdapter.STATE_OFF:
+          case jni.BluetoothAdapter.STATE_OFF:
             _isEnabledCtrl.add(false);
             break;
         }
         break;
-      case android.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
+      case jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
         final extraDev = _getExtraDev(intent);
         final bondState = intent.getIntExtra(
-            android.BluetoothDevice.EXTRA_BOND_STATE.toJString(), -1);
+            jni.BluetoothDevice.EXTRA_BOND_STATE.toJString(), -1);
         switch (bondState) {
-          case android.BluetoothDevice.BOND_BONDED:
+          case jni.BluetoothDevice.BOND_BONDED:
             _pairedDevicesCtrl.add(
               _pairedDevicesCtrl.value
                 ..add(
@@ -107,7 +105,7 @@ class TheLastBluetooth {
                 ),
             );
             break;
-          case android.BluetoothDevice.BOND_NONE:
+          case jni.BluetoothDevice.BOND_NONE:
             _pairedDevicesCtrl.add(
               _pairedDevicesCtrl.value
                 ..removeWhere((dev) {
@@ -122,31 +120,31 @@ class TheLastBluetooth {
             break;
         }
         break;
-      case android.BluetoothDevice.ACTION_ACL_CONNECTED:
+      case jni.BluetoothDevice.ACTION_ACL_CONNECTED:
         final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(true);
         break;
-      case android.BluetoothDevice.ACTION_ACL_DISCONNECTED:
+      case jni.BluetoothDevice.ACTION_ACL_DISCONNECTED:
         final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(false);
         break;
-      case android.BluetoothDevice.ACTION_NAME_CHANGED:
+      case jni.BluetoothDevice.ACTION_NAME_CHANGED:
         final extraDev = _getExtraDev(intent);
         final name = intent
-            .getStringExtra(android.BluetoothDevice.EXTRA_NAME.toJString())
+            .getStringExtra(jni.BluetoothDevice.EXTRA_NAME.toJString())
             .toDString();
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.nameCtrl
             .add(name);
         break;
-      case android.BluetoothDevice.ACTION_ALIAS_CHANGED:
+      case jni.BluetoothDevice.ACTION_ALIAS_CHANGED:
         final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
@@ -166,24 +164,23 @@ class TheLastBluetooth {
     }
   }
 
-  ({String mac, android.BluetoothDevice dev}) _getExtraDev(
-      android.Intent intent) {
+  ({String mac, jni.BluetoothDevice dev}) _getExtraDev(jni.Intent intent) {
     final extraDev = intent.getParcelableExtra(
-      android.BluetoothDevice.EXTRA_DEVICE.toJString(),
-      T: const android.$BluetoothDeviceType(),
+      jni.BluetoothDevice.EXTRA_DEVICE.toJString(),
+      T: const jni.$BluetoothDeviceType(),
     );
     return (mac: extraDev.getAddress().toDString(), dev: extraDev);
   }
 
-  _BluetoothDevice _androidDevToDart(android.BluetoothDevice dev) {
+  _BluetoothDevice _androidDevToDart(jni.BluetoothDevice dev) {
     final uuids = dev.getUuids();
-    final battery = android.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
+    final battery = jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
     return _BluetoothDevice(
       dev.getAddress().toDString(),
       nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
       aliasCtrl: BehaviorSubject.seeded(dev.getAlias().toDString()),
       isConnectedCtrl: BehaviorSubject.seeded(
-          android.TheLastUtils.isBluetoothDeviceConnected(dev)),
+          jni.TheLastUtils.isBluetoothDeviceConnected(dev)),
       uuidsCompleter: Completer()
         ..complete(
           Iterable.generate(
