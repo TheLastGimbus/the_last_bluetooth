@@ -23,6 +23,23 @@ class _MyAppState extends State<MyApp> {
     _bt = Permission.bluetoothConnect
         .request()
         .then((value) => TheLastBluetooth.instance);
+    _bt.then((bt) async {
+      final otter =
+          await bt.pairedDevices.firstWhere((all) => all.isNotEmpty).then(
+                (all) => all.firstWhereOrNull(
+                    (dev) => dev.name.valueOrNull == 'HUAWEI FreeBuds 4i'),
+              );
+      if (otter != null) {
+        Future.delayed(Duration(seconds: 10)).then((value) async {
+          bt
+              .connectRfcomm(otter, "00001101-0000-1000-8000-00805f9b34fb")
+              .stream
+              .listen((event) {
+            print('WOOO: $event');
+          });
+        });
+      }
+    });
   }
 
   @override
@@ -40,81 +57,76 @@ class _MyAppState extends State<MyApp> {
                   )
                 : const Text('Loading...'),
           ),
-          body: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  snapBt.hasData
-                      ? StreamBuilder(
-                          stream: snapBt.data!.pairedDevices,
-                          builder: (_, snap) => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (snap.hasData)
-                                for (final dev in snap.data!)
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+          body: ListView(
+            children: [
+              snapBt.hasData
+                  ? StreamBuilder(
+                      stream: snapBt.data!.pairedDevices,
+                      builder: (_, snap) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (snap.hasData)
+                            for (final dev in snap.data!)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          StreamBuilder(
-                                            stream: dev.alias,
-                                            builder: (_, snap) =>
-                                                Text(snap.data ?? 'null'),
-                                          ),
-                                          const Text(' '),
-                                          StreamBuilder(
-                                            stream: dev.isConnected,
-                                            builder: (_, snap) => Text(
-                                                snap.data != null
-                                                    ? (snap.data! ? '✅' : '❌')
-                                                    : 'null'),
-                                          ),
-                                          const Text(' '),
-                                          StreamBuilder(
-                                            stream: dev.battery,
-                                            builder: (_, snap) => Text(
-                                                snap.data != null
-                                                    ? '🔋${snap.data}%'
-                                                    : ''),
-                                          ),
-                                        ],
+                                      StreamBuilder(
+                                        stream: dev.alias,
+                                        builder: (_, snap) =>
+                                            Text(snap.data ?? 'null'),
                                       ),
-                                      FutureBuilder(
-                                        future: dev.uuids,
-                                        builder: (_, snap) => Column(
-                                          children: [
-                                            if (snap.hasData)
-                                              Text(
-                                                snap.data!
-                                                    .map((uuid) =>
-                                                        BluetoothIdentifiers
-                                                            .uuidServiceIdentifiers[
-                                                                int.parse(
-                                                                    uuid.substring(
-                                                                        4, 8),
-                                                                    radix: 16)]
-                                                            ?.registrant ??
-                                                        'null')
-                                                    .join(', '),
-                                                style: const TextStyle(
-                                                    fontSize: 10),
-                                              ),
-                                          ],
+                                      const Text(' '),
+                                      StreamBuilder(
+                                        stream: dev.isConnected,
+                                        builder: (_, snap) => Text(
+                                          snap.data != null
+                                              ? (snap.data! ? '✅' : '❌')
+                                              : 'null',
+                                        ),
+                                      ),
+                                      const Text(' '),
+                                      StreamBuilder(
+                                        stream: dev.battery,
+                                        builder: (_, snap) => Text(
+                                          snap.data != null
+                                              ? '🔋${snap.data}%'
+                                              : '',
                                         ),
                                       ),
                                     ],
                                   ),
-                            ],
-                          ),
-                        )
-                      : const Text('Requesting permission...')
-                ],
-              ),
-            ),
+                                  FutureBuilder(
+                                    future: dev.uuids,
+                                    builder: (_, snap) => Column(
+                                      children: [
+                                        if (snap.hasData)
+                                          Text(
+                                            snap.data!
+                                                .map((uuid) =>
+                                                    BluetoothIdentifiers
+                                                        .uuidServiceIdentifiers[
+                                                            int.parse(
+                                                                uuid.substring(
+                                                                    4, 8),
+                                                                radix: 16)]
+                                                        ?.registrant ??
+                                                    'null')
+                                                .join(', '),
+                                            style:
+                                                const TextStyle(fontSize: 10),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                        ],
+                      ),
+                    )
+                  : const Text('Requesting permission...')
+            ],
           ),
         ),
       ),
