@@ -46,41 +46,13 @@ class TheLastBluetooth {
     _isEnabledCtrl.listen((event) {
       if (event) {
         _pairedDevicesCtrl.add(
-          _adapter.getBondedDevices().map(
-            (dev) {
-              final uuids = dev.getUuids();
-              final battery =
-                  android.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
-              return _BluetoothDevice(
-                dev.getAddress().toDString(),
-                nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
-                aliasCtrl: BehaviorSubject.seeded(dev.getAlias().toDString()),
-                isConnectedCtrl: BehaviorSubject.seeded(
-                    android.TheLastUtils.isBluetoothDeviceConnected(dev)),
-                uuidsCompleter: Completer()
-                  ..complete(
-                    Iterable.generate(
-                      uuids.length,
-                      (i) => uuids[i].toString(),
-                    ).toSet(),
-                  ),
-                batteryLevelCtrl: battery >= 0
-                    ? BehaviorSubject.seeded(battery)
-                    : BehaviorSubject(),
-              );
-            },
-          ).toSet(),
+          _adapter
+              .getBondedDevices()
+              .map((dev) => _androidDevToDart(dev))
+              .toSet(),
         );
       } else {
-        _pairedDevicesCtrl.valueOrNull?.forEach((dev) {
-          dev.nameCtrl.close();
-          dev.aliasCtrl.close();
-          dev.isConnectedCtrl.close();
-          if (!dev.uuidsCompleter.isCompleted) {
-            dev.uuidsCompleter.complete(<String>{});
-          }
-          dev.batteryLevelCtrl.close();
-        });
+        _pairedDevicesCtrl.valueOrNull?.forEach((dev) => dev.close());
         _pairedDevicesCtrl.add(<_BluetoothDevice>{});
       }
     });
@@ -109,18 +81,7 @@ class TheLastBluetooth {
   }
 
   void onReceive(android.Context context, android.Intent intent) {
-    ({String mac, android.BluetoothDevice dev}) getExtraDev(
-        android.Intent intent) {
-      final extraDev = intent.getParcelableExtra(
-        android.BluetoothDevice.EXTRA_DEVICE.toJString(),
-        T: const android.$BluetoothDeviceType(),
-      );
-      return (mac: extraDev.getAddress().toDString(), dev: extraDev);
-    }
-
     switch (intent.getAction().toDString()) {
-      // oh my god, Dart shines already <3
-      // and we're not fully JNI yet :')
       case android.BluetoothAdapter.ACTION_STATE_CHANGED:
         final btState = intent.getIntExtra(
             android.BluetoothAdapter.EXTRA_STATE.toJString(), -1);
@@ -134,37 +95,15 @@ class TheLastBluetooth {
         }
         break;
       case android.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
-        final extraDev = getExtraDev(intent);
+        final extraDev = _getExtraDev(intent);
         final bondState = intent.getIntExtra(
             android.BluetoothDevice.EXTRA_BOND_STATE.toJString(), -1);
         switch (bondState) {
           case android.BluetoothDevice.BOND_BONDED:
-            final uuids = extraDev.dev.getUuids();
-            final battery =
-                android.TheLastUtils.bluetoothDeviceBatteryLevel(extraDev.dev);
             _pairedDevicesCtrl.add(
               _pairedDevicesCtrl.value
                 ..add(
-                  _BluetoothDevice(
-                    extraDev.mac,
-                    nameCtrl: BehaviorSubject.seeded(
-                        extraDev.dev.getName().toDString()),
-                    aliasCtrl: BehaviorSubject.seeded(
-                        extraDev.dev.getAlias().toDString()),
-                    isConnectedCtrl: BehaviorSubject.seeded(
-                        android.TheLastUtils.isBluetoothDeviceConnected(
-                            extraDev.dev)),
-                    uuidsCompleter: Completer()
-                      ..complete(
-                        Iterable.generate(
-                          uuids.length,
-                          (i) => uuids[i].toString(),
-                        ).toSet(),
-                      ),
-                    batteryLevelCtrl: battery >= 0
-                        ? BehaviorSubject.seeded(battery)
-                        : BehaviorSubject(),
-                  ),
+                  _androidDevToDart(extraDev.dev),
                 ),
             );
             break;
@@ -173,13 +112,7 @@ class TheLastBluetooth {
               _pairedDevicesCtrl.value
                 ..removeWhere((dev) {
                   if (dev.mac == extraDev.mac) {
-                    dev.nameCtrl.close();
-                    dev.aliasCtrl.close();
-                    dev.isConnectedCtrl.close();
-                    if (!dev.uuidsCompleter.isCompleted) {
-                      dev.uuidsCompleter.complete(<String>{});
-                    }
-                    dev.batteryLevelCtrl.close();
+                    dev.close();
                     return true;
                   } else {
                     return false;
@@ -190,21 +123,21 @@ class TheLastBluetooth {
         }
         break;
       case android.BluetoothDevice.ACTION_ACL_CONNECTED:
-        final extraDev = getExtraDev(intent);
+        final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(true);
         break;
       case android.BluetoothDevice.ACTION_ACL_DISCONNECTED:
-        final extraDev = getExtraDev(intent);
+        final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(false);
         break;
       case android.BluetoothDevice.ACTION_NAME_CHANGED:
-        final extraDev = getExtraDev(intent);
+        final extraDev = _getExtraDev(intent);
         final name = intent
             .getStringExtra(android.BluetoothDevice.EXTRA_NAME.toJString())
             .toDString();
@@ -214,14 +147,14 @@ class TheLastBluetooth {
             .add(name);
         break;
       case android.BluetoothDevice.ACTION_ALIAS_CHANGED:
-        final extraDev = getExtraDev(intent);
+        final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.aliasCtrl
             .add(extraDev.dev.getAlias().toDString());
         break;
       case _ACTION_BATTERY_LEVEL_CHANGED:
-        final extraDev = getExtraDev(intent);
+        final extraDev = _getExtraDev(intent);
         final battery =
             intent.getIntExtra(_EXTRA_BATTERY_LEVEL.toJString(), -1);
         if (battery >= 0) {
@@ -231,6 +164,36 @@ class TheLastBluetooth {
               .addDistinct(battery);
         }
     }
+  }
+
+  ({String mac, android.BluetoothDevice dev}) _getExtraDev(
+      android.Intent intent) {
+    final extraDev = intent.getParcelableExtra(
+      android.BluetoothDevice.EXTRA_DEVICE.toJString(),
+      T: const android.$BluetoothDeviceType(),
+    );
+    return (mac: extraDev.getAddress().toDString(), dev: extraDev);
+  }
+
+  _BluetoothDevice _androidDevToDart(android.BluetoothDevice dev) {
+    final uuids = dev.getUuids();
+    final battery = android.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
+    return _BluetoothDevice(
+      dev.getAddress().toDString(),
+      nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
+      aliasCtrl: BehaviorSubject.seeded(dev.getAlias().toDString()),
+      isConnectedCtrl: BehaviorSubject.seeded(
+          android.TheLastUtils.isBluetoothDeviceConnected(dev)),
+      uuidsCompleter: Completer()
+        ..complete(
+          Iterable.generate(
+            uuids.length,
+            (i) => uuids[i].toString(),
+          ).toSet(),
+        ),
+      batteryLevelCtrl:
+          battery >= 0 ? BehaviorSubject.seeded(battery) : BehaviorSubject(),
+    );
   }
 
   // maybetodo: Make this real ??
@@ -263,6 +226,16 @@ class _BluetoothDevice implements BluetoothDevice {
   final BehaviorSubject<bool> isConnectedCtrl;
   final Completer<Set<String>> uuidsCompleter;
   final BehaviorSubject<int> batteryLevelCtrl;
+
+  void close() {
+    nameCtrl.close();
+    aliasCtrl.close();
+    isConnectedCtrl.close();
+    if (!uuidsCompleter.isCompleted) {
+      uuidsCompleter.complete(<String>{});
+    }
+    batteryLevelCtrl.close();
+  }
 
   @override
   ValueStream<String> get name => nameCtrl.stream;
