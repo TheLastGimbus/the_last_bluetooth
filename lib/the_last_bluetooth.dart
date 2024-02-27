@@ -244,7 +244,7 @@ class TheLastBluetooth {
           fromDevice.add(
             Uint8List.fromList(
               List.generate(
-                buffer.length,
+                read,
                 (i) => buffer[i],
               ),
             ),
