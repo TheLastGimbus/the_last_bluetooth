@@ -10,6 +10,8 @@ import 'package:the_last_bluetooth/src/android_bluetooth.g.dart' as jni;
 
 import 'src/bluetooth_device.dart';
 
+export 'src/bluetooth_device.dart';
+
 class TheLastBluetooth {
   // secret commands 😋
   // ohhhh i fucking love android
@@ -29,7 +31,9 @@ class TheLastBluetooth {
   final _isEnabledCtrl = BehaviorSubject<bool>();
   final _pairedDevicesCtrl = BehaviorSubject<Set<_BluetoothDevice>>();
 
-  TheLastBluetooth._() {
+  TheLastBluetooth._();
+
+  void init() {
     // TODO: maybe don't require permission to init plugin but gradually, huh??
     // TODO: DEVICES OFTEN "BLINK" ABOUT THEIR CONNECTION
 
@@ -203,6 +207,7 @@ class TheLastBluetooth {
     assert(ourDev?.isConnected.valueOrNull ?? false);
     final toDevice = StreamController<Uint8List>();
     final fromDevice = StreamController<Uint8List>.broadcast();
+    StreamSubscription? fromDeviceLoopSub;
     final jniDev = _adapter.getRemoteDevice(ourDev!.mac.toJString());
     final socket = jniDev.createRfcommSocketToServiceRecord(
       jni.UUID.fromString(serviceUuid.toJString()),
@@ -218,50 +223,64 @@ class TheLastBluetooth {
     final jniToDevice = socket.getOutputStream();
     final jniFromDevice = socket.getInputStream();
 
+    closeEverything() {
+      toDevice.close();
+      fromDevice.close();
+      fromDeviceLoopSub?.cancel();
+      socket.close();
+    }
+
     toDevice.stream.listen((received) {
       final buffer = JArray(const jbyteType(), received.length);
-      for (var i = 0; i < received.length; i++) {
-        buffer[i] = received[i];
+      received.forEachIndexed((i, e) => buffer[i] = e);
+      try {
+        // maybe: make new isolate for this some day
+        jniToDevice.write1(buffer);
+      } catch (_) {
+        closeEverything();
       }
-      // maybe: make new isolate for this some day
-      jniToDevice.write1(buffer);
     }, onDone: () {
-      jniToDevice.close();
-      jniFromDevice.close();
-      socket.close();
+      closeEverything();
     });
 
-    late StreamSubscription loopSub;
-    loopSub = loopStream(() async {
+    fromDeviceLoopSub = loopStream(() async {
       try {
-        if (jniFromDevice.available() > 0) {
+        // okay, listen, i don't know WHAT THE FUCK is a right method to detect
+        // this socket disconnecting. even this, literally spelled out shit
+        // "IS_CONNECTED" is always returning true. i will just try-catch
+        // everything and pray it works
+        if (!socket.isConnected()) return false;
+        final available = jniFromDevice.available();
+        if (available > 0) {
           final buffer = JArray(const jbyteType(), 1024);
-          final read = jniFromDevice.read1(buffer);
-          if (read < 0) {
-            loopSub.cancel();
-            return;
-          }
-          fromDevice.add(
-            Uint8List.fromList(
-              List.generate(
-                read,
-                (i) => buffer[i],
+          try {
+            final read = jniFromDevice.read1(buffer);
+            if (read < 0) return false;
+            fromDevice.add(
+              Uint8List.fromList(
+                List.generate(
+                  read,
+                  (i) => buffer[i],
+                ),
               ),
-            ),
-          );
+            );
+          } catch (_) {
+            return false;
+          }
+        } else if (available < 0) {
+          return false;
         } else {
           // input lag will be *at most* 10ms
           // Apple Vision Pro is 12ms
           // we're good
           await Future.delayed(const Duration(milliseconds: 10));
         }
-      } catch (e) {
-        loopSub.cancel();
-        return;
+      } catch (_) {
+        return false;
       }
-      return;
+      return true;
     }).listen((_) {}, onDone: () {
-      fromDevice.close();
+      closeEverything();
     });
     return StreamChannel(fromDevice.stream, toDevice.sink);
   }
@@ -340,10 +359,13 @@ extension TheLastSubject<T> on BehaviorSubject<T> {
   }
 }
 
-// stream that does computation() as long as it's listened
-// when it's .close()d, it stops
-Stream<T> loopStream<T>(FutureOr<T> Function() computation) async* {
+/// stream that does computation() as long as it's listened and computation()
+/// returns true
+/// when it's .close()d, or returns false, it stops
+Stream<bool> loopStream(FutureOr<bool> Function() computation) async* {
   while (true) {
-    yield await computation();
+    final status = await computation();
+    yield status;
+    if (!status) break;
   }
 }

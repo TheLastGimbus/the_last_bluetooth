@@ -1,5 +1,4 @@
 import 'package:bluetooth_identifiers/bluetooth_identifiers.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';
@@ -21,27 +20,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _bt = Permission.bluetoothConnect
-        .request()
-        .then((value) => TheLastBluetooth.instance);
-    _bt.then((bt) async {
-      final otter =
-          await bt.pairedDevices.firstWhere((all) => all.isNotEmpty).then(
-                (all) => all.firstWhereOrNull(
-                    (dev) => dev.name.valueOrNull == 'HUAWEI FreeBuds 4i'),
-              );
-      if (otter != null) {
-        Future.delayed(Duration(seconds: 10)).then((value) async {
-          bt
-              .connectRfcomm(otter, "00001101-0000-1000-8000-00805f9b34fb")
-              .stream
-              .listen((event) {
-            print('WOOO: $event');
-          });
-        });
-      }
-    });
+    _bt = _setupBluetooth();
   }
+
+  Future<TheLastBluetooth> _setupBluetooth() =>
+      Permission.bluetoothConnect.request().then(
+            (value) async => value.isGranted
+                ? (TheLastBluetooth.instance..init())
+                : await _setupBluetooth(),
+          );
 
   @override
   Widget build(BuildContext context) {
