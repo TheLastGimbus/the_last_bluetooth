@@ -41,10 +41,12 @@ class TheLastUtils() {
     }
 }
 
+@Keep
 interface BroadcastReceiverInterface {
     fun onReceive(context: Context, intent: Intent)
 }
 
+@Keep
 class TheLastBroadcastReceiver(private val receiverInterface: BroadcastReceiverInterface) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) = receiverInterface.onReceive(context, intent)
 }
