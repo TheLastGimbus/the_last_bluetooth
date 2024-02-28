@@ -199,6 +199,23 @@ class TheLastBluetooth {
     );
   }
 
+  // ###### IMPORTANT NOTES ######
+  // Current stance on detecting closed socket:
+  // it seems that android gives me absolutely no way of detecting that, besides
+  // actually reading/writing and getting an exception
+  // That wouldn't be a problem if i continuously used .read() in while(true)
+  // loop, but I don't want yet to port it to separate Isolate (and it doesn't
+  // seem to work out-of-the-box). So, right now, you just wait until your first
+  // write (after close) to get this lovely surprise!
+  /// Returned [StreamChannel] is your go-to place for literally every aspect
+  /// of communication with your socket 🎉
+  ///
+  /// - You want to write? `channel.sink.add(data)`
+  /// - Want to read? `channel.stream.listen()`
+  /// - Want to close? `channel.sink.close()`.
+  /// - Want to know when it's closed? `channel.stream.listen().asFuture()`
+  ///
+  /// 🥰🥰
   StreamChannel<Uint8List> connectRfcomm(
       BluetoothDevice device, String serviceUuid,
       {bool force = false}) {

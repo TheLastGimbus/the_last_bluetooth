@@ -12,4 +12,14 @@ abstract class BluetoothDevice {
   Future<Set<String>> get uuids;
 
   ValueStream<int> get battery;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BluetoothDevice &&
+          runtimeType == other.runtimeType &&
+          mac == other.mac;
+
+  @override
+  int get hashCode => mac.hashCode;
 }
