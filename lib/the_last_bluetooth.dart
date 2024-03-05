@@ -41,9 +41,9 @@ class TheLastBluetooth {
     Jni.initDLApi();
     final ctx = jni.Context.fromRef(Jni.getCachedApplicationContext());
 
-    _manager = jni.BluetoothManager.fromRef(
-      ctx.getSystemService(jni.Context.BLUETOOTH_SERVICE.toJString()).reference,
-    );
+    _manager = ctx
+        .getSystemService(jni.Context.BLUETOOTH_SERVICE.toJString())
+        .castTo(const jni.$BluetoothManagerType());
     _adapter = _manager.getAdapter();
 
     // emit devices when enabled, clear when disabled
