@@ -1,13 +1,12 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lastgimbus.the.lastbluetooth_example">
-
-    <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
-
-    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Request legacy Bluetooth permissions on older devices. -->
+    <uses-permission
+            android:name="android.permission.BLUETOOTH"
+            android:maxSdkVersion="30" />
+    <!-- Needed only if your app communicates with already-paired Bluetooth devices. -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
-   <application
+    <application
         android:label="the_last_bluetooth_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

@@ -1,20 +1,25 @@
+// The Android Gradle Plugin builds the native code with the Android NDK.
+
 group 'com.lastgimbus.the.lastbluetooth'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext {
+        kotlin_version = '1.9.22'
+    }
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        // The Android Gradle Plugin knows how to build native code with the NDK.
+        classpath 'com.android.tools.build:gradle:7.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
-allprojects {
+rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
@@ -22,29 +27,52 @@ allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion 31
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.lastgimbus.the.lastbluetooth'
+    }
+
+    // Bumping the plugin compileSdkVersion requires all clients of this plugin
+    // to bump the version in their app.
+    compileSdk 33
+
+    // Use the NDK version
+    // declared in /android/app/build.gradle file of the Flutter project.
+    // Replace it with a version number if this plugin requires a specfic NDK version.
+    // (e.g. ndkVersion "23.1.7779620")
+    ndkVersion android.ndkVersion
+
+    // Don't forget my Kotlin, gradle 🥺🥺
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    // Invoke the shared CMake build with the Android Gradle Plugin.
+    externalNativeBuild {
+        cmake {
+            path "../c_src/jnigen/CMakeLists.txt"
+
+            // The default CMake version for the Android Gradle Plugin is 3.10.2.
+            // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
+            //
+            // The Flutter tooling requires that developers have CMake 3.10 or later
+            // installed. You should not increase this version, as doing so will cause
+            // the plugin to fail to compile for some customers of the plugin.
+            // version "3.10.2"
+        }
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 19
     }
-}
-
-dependencies {
-    implementation "androidx.core:core-ktx:1.9.0"
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 }
