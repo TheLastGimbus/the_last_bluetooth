@@ -38,11 +38,10 @@ class TheLastBluetooth {
     // TODO: DEVICES OFTEN "BLINK" ABOUT THEIR CONNECTION
 
     // this is some init stuff - maybe move this to manual init() dispose() ?
-    Jni.initDLApi();
-    final ctx = jni.Context.fromRef(Jni.getCachedApplicationContext());
+    final ctx = jni.Context.fromReference(Jni.getCachedApplicationContext());
 
     _manager = ctx
-        .getSystemService(jni.Context.BLUETOOTH_SERVICE.toJString())
+        .getSystemService(jni.Context.BLUETOOTH_SERVICE)
         .castTo(const jni.$BluetoothManagerType(), releaseOriginal: true);
     _adapter = _manager.getAdapter();
 
@@ -77,18 +76,19 @@ class TheLastBluetooth {
       jni.BluetoothDevice.ACTION_ACL_DISCONNECTED,
       jni.BluetoothDevice.ACTION_NAME_CHANGED,
       jni.BluetoothDevice.ACTION_ALIAS_CHANGED,
-      _ACTION_BATTERY_LEVEL_CHANGED,
+      _ACTION_BATTERY_LEVEL_CHANGED.toJString(),
     ]) {
-      filter.addAction(action.toJString());
+      filter.addAction(action);
     }
     ctx.registerReceiver(tlr, filter);
   }
 
   void onReceive(jni.Context context, jni.Intent intent) {
-    switch (intent.getAction().toDString()) {
-      case jni.BluetoothAdapter.ACTION_STATE_CHANGED:
+    final action = intent.getAction();
+    switch (action) {
+      case _ when action == jni.BluetoothAdapter.ACTION_STATE_CHANGED:
         final btState = intent.getIntExtra(
-            jni.BluetoothAdapter.EXTRA_STATE.toJString(), -1);
+            jni.BluetoothAdapter.EXTRA_STATE, -1);
         switch (btState) {
           case jni.BluetoothAdapter.STATE_ON:
             _isEnabledCtrl.add(true);
@@ -98,10 +98,10 @@ class TheLastBluetooth {
             break;
         }
         break;
-      case jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
+      case _ when action == jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
         final extraDev = _getExtraDev(intent);
         final bondState = intent.getIntExtra(
-            jni.BluetoothDevice.EXTRA_BOND_STATE.toJString(), -1);
+            jni.BluetoothDevice.EXTRA_BOND_STATE, -1);
         switch (bondState) {
           case jni.BluetoothDevice.BOND_BONDED:
             _pairedDevicesCtrl.add(
@@ -126,38 +126,38 @@ class TheLastBluetooth {
             break;
         }
         break;
-      case jni.BluetoothDevice.ACTION_ACL_CONNECTED:
+      case _ when action == jni.BluetoothDevice.ACTION_ACL_CONNECTED:
         final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(true);
         break;
-      case jni.BluetoothDevice.ACTION_ACL_DISCONNECTED:
+      case _ when action == jni.BluetoothDevice.ACTION_ACL_DISCONNECTED:
         final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(false);
         break;
-      case jni.BluetoothDevice.ACTION_NAME_CHANGED:
+      case _ when action == jni.BluetoothDevice.ACTION_NAME_CHANGED:
         final extraDev = _getExtraDev(intent);
         final name = intent
-            .getStringExtra(jni.BluetoothDevice.EXTRA_NAME.toJString())
+            .getStringExtra(jni.BluetoothDevice.EXTRA_NAME)
             .toDString();
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.nameCtrl
             .add(name);
         break;
-      case jni.BluetoothDevice.ACTION_ALIAS_CHANGED:
+      case _ when action == jni.BluetoothDevice.ACTION_ALIAS_CHANGED:
         final extraDev = _getExtraDev(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.aliasCtrl
             .add(extraDev.dev.getAlias().toDString());
         break;
-      case _ACTION_BATTERY_LEVEL_CHANGED:
+      case _ when action == _ACTION_BATTERY_LEVEL_CHANGED:
         final extraDev = _getExtraDev(intent);
         final battery =
             intent.getIntExtra(_EXTRA_BATTERY_LEVEL.toJString(), -1);
@@ -172,7 +172,7 @@ class TheLastBluetooth {
 
   ({String mac, jni.BluetoothDevice dev}) _getExtraDev(jni.Intent intent) {
     final extraDev = intent.getParcelableExtra(
-      jni.BluetoothDevice.EXTRA_DEVICE.toJString(),
+      jni.BluetoothDevice.EXTRA_DEVICE,
       T: const jni.$BluetoothDeviceType(),
     );
     return (mac: extraDev.getAddress().toDString(), dev: extraDev);
