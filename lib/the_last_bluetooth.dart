@@ -8,6 +8,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/src/android_bluetooth.g.dart' as jni;
 
+import 'src/android_enums.dart' as enums;
 import 'src/bluetooth_device.dart';
 import 'src/ctrl_bluetooth_device.dart';
 import 'src/utils.dart';
@@ -15,13 +16,6 @@ import 'src/utils.dart';
 export 'src/bluetooth_device.dart';
 
 class TheLastBluetooth {
-  // secret commands 😋
-  // ohhhh i fucking love android
-  static const _ACTION_BATTERY_LEVEL_CHANGED =
-      "android.bluetooth.device.action.BATTERY_LEVEL_CHANGED";
-  static const _EXTRA_BATTERY_LEVEL =
-      "android.bluetooth.device.extra.BATTERY_LEVEL";
-
   static final TheLastBluetooth _instance = TheLastBluetooth._();
 
   static TheLastBluetooth get instance => _instance;
@@ -80,7 +74,7 @@ class TheLastBluetooth {
       jni.BluetoothDevice.ACTION_ACL_DISCONNECTED,
       jni.BluetoothDevice.ACTION_NAME_CHANGED,
       jni.BluetoothDevice.ACTION_ALIAS_CHANGED,
-      _ACTION_BATTERY_LEVEL_CHANGED.toJString(),
+      enums.BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED.toJString(),
     ]) {
       filter.addAction(action);
     }
@@ -89,21 +83,20 @@ class TheLastBluetooth {
 
   void onReceive(jni.Context? context, jni.Intent? intent) {
     (context, intent) = (context!, intent!);
-    final action = intent.getAction();
+
+    /// Shitty helper function for less writing
+    CtrlBluetoothDevice? getPairedDevice(String mac) =>
+        _pairedDevicesCtrl.value.firstWhereOrNull((dev) => dev.mac == mac);
+
+    final action = intent.getAction()!.toDString();
     switch (action) {
-      case _ when action == jni.BluetoothAdapter.ACTION_STATE_CHANGED:
-        final btState =
-            intent.getIntExtra(jni.BluetoothAdapter.EXTRA_STATE, -1);
-        switch (btState) {
-          case jni.BluetoothAdapter.STATE_ON:
-            _isEnabledCtrl.add(true);
-            break;
-          case jni.BluetoothAdapter.STATE_OFF:
-            _isEnabledCtrl.add(false);
-            break;
-        }
+      case enums.BluetoothAdapter.ACTION_STATE_CHANGED:
+        _isEnabledCtrl.addDistinct(
+          intent.getIntExtra(jni.BluetoothAdapter.EXTRA_STATE, -1) ==
+              jni.BluetoothAdapter.STATE_ON,
+        );
         break;
-      case _ when action == jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
+      case enums.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
         final extraDev = getDeviceExtra(intent);
         final bondState =
             intent.getIntExtra(jni.BluetoothDevice.EXTRA_BOND_STATE, -1);
@@ -131,45 +124,32 @@ class TheLastBluetooth {
             break;
         }
         break;
-      case _ when action == jni.BluetoothDevice.ACTION_ACL_CONNECTED:
-        final extraDev = getDeviceExtra(intent);
-        _pairedDevicesCtrl.value
-            .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
-            ?.isConnectedCtrl
-            .add(true);
+      case enums.BluetoothDevice.ACTION_ACL_CONNECTED:
+        getPairedDevice(getDeviceExtra(intent).mac)?.isConnectedCtrl.add(true);
         break;
-      case _ when action == jni.BluetoothDevice.ACTION_ACL_DISCONNECTED:
-        final extraDev = getDeviceExtra(intent);
-        _pairedDevicesCtrl.value
-            .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
-            ?.isConnectedCtrl
-            .add(false);
+      case enums.BluetoothDevice.ACTION_ACL_DISCONNECTED:
+        getPairedDevice(getDeviceExtra(intent).mac)?.isConnectedCtrl.add(false);
         break;
-      case _ when action == jni.BluetoothDevice.ACTION_NAME_CHANGED:
-        final extraDev = getDeviceExtra(intent);
-        final name =
-            intent.getStringExtra(jni.BluetoothDevice.EXTRA_NAME)!.toDString();
-        _pairedDevicesCtrl.value
-            .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
-            ?.nameCtrl
-            .add(name);
+      case enums.BluetoothDevice.ACTION_NAME_CHANGED:
+        final dev = getDeviceExtra(intent);
+        getPairedDevice(dev.mac)?.nameCtrl.add(dev.dev.getName()!.toDString());
         break;
-      case _ when action == jni.BluetoothDevice.ACTION_ALIAS_CHANGED:
-        final extraDev = getDeviceExtra(intent);
-        _pairedDevicesCtrl.value
-            .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
+      case enums.BluetoothDevice.ACTION_ALIAS_CHANGED:
+        final dev = getDeviceExtra(intent);
+        getPairedDevice(dev.mac)
             ?.aliasCtrl
-            .add(extraDev.dev.getAlias()!.toDString());
+            .add(dev.dev.getAlias()!.toDString());
         break;
-      case _ when action == _ACTION_BATTERY_LEVEL_CHANGED:
-        final extraDev = getDeviceExtra(intent);
-        final battery =
-            intent.getIntExtra(_EXTRA_BATTERY_LEVEL.toJString(), -1);
+      case enums.BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED:
+        final dev = getDeviceExtra(intent);
+        var battery = intent.getIntExtra(
+            enums.BluetoothDevice.EXTRA_BATTERY_LEVEL.toJString(), -1);
+        if (battery < 0) {
+          // fallback, but still can return -1
+          battery = jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev.dev);
+        }
         if (battery >= 0) {
-          _pairedDevicesCtrl.value
-              .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
-              ?.batteryLevelCtrl
-              .addDistinct(battery);
+          getPairedDevice(dev.mac)?.batteryLevelCtrl.addDistinct(battery);
         }
     }
   }
