@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
+import 'package:the_last_bluetooth/src/utils.dart';
 
+import 'android_bluetooth.g.dart' as jni;
 import 'bluetooth_device.dart';
 
 class CtrlBluetoothDevice implements BluetoothDevice {
@@ -53,4 +55,22 @@ class CtrlBluetoothDevice implements BluetoothDevice {
 
   @override
   ValueStream<int> get battery => batteryLevelCtrl.stream;
+
+  static CtrlBluetoothDevice fromAndroidBluetoothDevice(
+      jni.BluetoothDevice dev) {
+    final battery = jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
+    return CtrlBluetoothDevice(
+      dev.getAddress()!.toDString(),
+      nameCtrl: BehaviorSubject.seeded(dev.getName()!.toDString()),
+      aliasCtrl: BehaviorSubject.seeded(dev.getAlias()!.toDString()),
+      isConnectedCtrl: BehaviorSubject.seeded(
+          jni.TheLastUtils.isBluetoothDeviceConnected(dev)),
+      uuidsCompleter: Completer()
+        ..complete(
+          dev.getUuids()!.map((e) => e.toString()).toSet(),
+        ),
+      batteryLevelCtrl:
+          battery >= 0 ? BehaviorSubject.seeded(battery) : BehaviorSubject(),
+    );
+  }
 }

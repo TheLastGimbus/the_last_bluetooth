@@ -1,8 +1,17 @@
-
 import 'dart:async';
 
 import 'package:jni/jni.dart';
 import 'package:rxdart/rxdart.dart';
+
+import 'android_bluetooth.g.dart' as jni;
+
+({String mac, jni.BluetoothDevice dev}) getDeviceExtra(jni.Intent intent) {
+  final extraDev = intent.getParcelableExtra(
+    jni.BluetoothDevice.EXTRA_DEVICE,
+    T: jni.BluetoothDevice.type,
+  )!;
+  return (mac: extraDev.getAddress()!.toDString(), dev: extraDev);
+}
 
 extension TheLastJString on JString {
   /// just with [releaseOriginal] true by default

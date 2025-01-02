@@ -53,7 +53,9 @@ class TheLastBluetooth {
         _pairedDevicesCtrl.add(
           _adapter
               .getBondedDevices()!
-              .map((dev) => _androidDevToDart(dev!))
+              .map(
+                (dev) => CtrlBluetoothDevice.fromAndroidBluetoothDevice(dev!),
+              )
               .toSet(),
         );
       } else {
@@ -102,7 +104,7 @@ class TheLastBluetooth {
         }
         break;
       case _ when action == jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
-        final extraDev = _getExtraDev(intent);
+        final extraDev = getDeviceExtra(intent);
         final bondState =
             intent.getIntExtra(jni.BluetoothDevice.EXTRA_BOND_STATE, -1);
         switch (bondState) {
@@ -110,7 +112,7 @@ class TheLastBluetooth {
             _pairedDevicesCtrl.add(
               _pairedDevicesCtrl.value
                 ..add(
-                  _androidDevToDart(extraDev.dev),
+                  CtrlBluetoothDevice.fromAndroidBluetoothDevice(extraDev.dev),
                 ),
             );
             break;
@@ -130,21 +132,21 @@ class TheLastBluetooth {
         }
         break;
       case _ when action == jni.BluetoothDevice.ACTION_ACL_CONNECTED:
-        final extraDev = _getExtraDev(intent);
+        final extraDev = getDeviceExtra(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(true);
         break;
       case _ when action == jni.BluetoothDevice.ACTION_ACL_DISCONNECTED:
-        final extraDev = _getExtraDev(intent);
+        final extraDev = getDeviceExtra(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.isConnectedCtrl
             .add(false);
         break;
       case _ when action == jni.BluetoothDevice.ACTION_NAME_CHANGED:
-        final extraDev = _getExtraDev(intent);
+        final extraDev = getDeviceExtra(intent);
         final name =
             intent.getStringExtra(jni.BluetoothDevice.EXTRA_NAME)!.toDString();
         _pairedDevicesCtrl.value
@@ -153,14 +155,14 @@ class TheLastBluetooth {
             .add(name);
         break;
       case _ when action == jni.BluetoothDevice.ACTION_ALIAS_CHANGED:
-        final extraDev = _getExtraDev(intent);
+        final extraDev = getDeviceExtra(intent);
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.aliasCtrl
             .add(extraDev.dev.getAlias()!.toDString());
         break;
       case _ when action == _ACTION_BATTERY_LEVEL_CHANGED:
-        final extraDev = _getExtraDev(intent);
+        final extraDev = getDeviceExtra(intent);
         final battery =
             intent.getIntExtra(_EXTRA_BATTERY_LEVEL.toJString(), -1);
         if (battery >= 0) {
@@ -170,35 +172,6 @@ class TheLastBluetooth {
               .addDistinct(battery);
         }
     }
-  }
-
-  ({String mac, jni.BluetoothDevice dev}) _getExtraDev(jni.Intent intent) {
-    final extraDev = intent.getParcelableExtra(
-      jni.BluetoothDevice.EXTRA_DEVICE,
-      T: jni.BluetoothDevice.type,
-    );
-    return (mac: extraDev!.getAddress()!.toDString(), dev: extraDev);
-  }
-
-  CtrlBluetoothDevice _androidDevToDart(jni.BluetoothDevice dev) {
-    final uuids = dev.getUuids();
-    final battery = jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
-    return CtrlBluetoothDevice(
-      dev.getAddress()!.toDString(),
-      nameCtrl: BehaviorSubject.seeded(dev.getName()!.toDString()),
-      aliasCtrl: BehaviorSubject.seeded(dev.getAlias()!.toDString()),
-      isConnectedCtrl: BehaviorSubject.seeded(
-          jni.TheLastUtils.isBluetoothDeviceConnected(dev)),
-      uuidsCompleter: Completer()
-        ..complete(
-          Iterable.generate(
-            uuids?.length ?? 0,
-            (i) => uuids![i].toString(),
-          ).toSet(),
-        ),
-      batteryLevelCtrl:
-          battery >= 0 ? BehaviorSubject.seeded(battery) : BehaviorSubject(),
-    );
   }
 
   // ###### IMPORTANT NOTES ######
