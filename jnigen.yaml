@@ -1,18 +1,13 @@
 android_sdk_config:
   add_gradle_deps: true
-  add_gradle_sources: true
+#  I think I don't need it for now...
+#  add_gradle_sources: true
   android_example: 'example/'
 
 output:
-  c:
-    library_name: the_last_bluetooth
-    path: c_src/jnigen/
   dart:
     path: lib/src/android_bluetooth.g.dart
     structure: single_file
-
-enable_experiment:
-  - interface_implementation
 
 classes:
   - 'java.util.UUID'

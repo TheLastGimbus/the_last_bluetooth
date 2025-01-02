@@ -49,20 +49,24 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    // Invoke the shared CMake build with the Android Gradle Plugin.
-    externalNativeBuild {
-        cmake {
-            path "../c_src/jnigen/CMakeLists.txt"
 
-            // The default CMake version for the Android Gradle Plugin is 3.10.2.
-            // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
-            //
-            // The Flutter tooling requires that developers have CMake 3.10 or later
-            // installed. You should not increase this version, as doing so will cause
-            // the plugin to fail to compile for some customers of the plugin.
-            // version "3.10.2"
-        }
-    }
+    /// WHY-COMMENTED-OUT:
+    // This was here previously, because for some reason i used c output in jni gen
+    // i don't remember it's use or anything, and i think this can be removed, but just leaving it for safety
+    // Invoke the shared CMake build with the Android Gradle Plugin.
+//    externalNativeBuild {
+//        cmake {
+//            path "../c_src/jnigen/CMakeLists.txt"
+//
+//            // The default CMake version for the Android Gradle Plugin is 3.10.2.
+//            // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
+//            //
+//            // The Flutter tooling requires that developers have CMake 3.10 or later
+//            // installed. You should not increase this version, as doing so will cause
+//            // the plugin to fail to compile for some customers of the plugin.
+//            // version "3.10.2"
+//        }
+//    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

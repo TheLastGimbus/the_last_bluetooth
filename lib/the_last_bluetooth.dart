@@ -41,17 +41,17 @@ class TheLastBluetooth {
     final ctx = jni.Context.fromReference(Jni.getCachedApplicationContext());
 
     _manager = ctx
-        .getSystemService(jni.Context.BLUETOOTH_SERVICE)
-        .castTo(const jni.$BluetoothManagerType(), releaseOriginal: true);
-    _adapter = _manager.getAdapter();
+        .getSystemService(jni.Context.BLUETOOTH_SERVICE)!
+        .as(jni.BluetoothManager.type);
+    _adapter = _manager.getAdapter()!;
 
     // emit devices when enabled, clear when disabled
     _isEnabledCtrl.listen((event) {
       if (event) {
         _pairedDevicesCtrl.add(
           _adapter
-              .getBondedDevices()
-              .map((dev) => _androidDevToDart(dev))
+              .getBondedDevices()!
+              .map((dev) => _androidDevToDart(dev!))
               .toSet(),
         );
       } else {
@@ -63,9 +63,9 @@ class TheLastBluetooth {
     _isEnabledCtrl.add(_adapter.isEnabled());
 
     // Register receiver:
-    final tlr = jni.TheLastBroadcastReceiver.new1(
+    final tlr = jni.TheLastBroadcastReceiver(
       jni.BroadcastReceiverInterface.implement(
-        jni.$BroadcastReceiverInterfaceImpl(onReceive: onReceive),
+        jni.$BroadcastReceiverInterface(onReceive: onReceive),
       ),
     );
     final filter = jni.IntentFilter();
@@ -83,12 +83,13 @@ class TheLastBluetooth {
     ctx.registerReceiver(tlr, filter);
   }
 
-  void onReceive(jni.Context context, jni.Intent intent) {
+  void onReceive(jni.Context? context, jni.Intent? intent) {
+    (context, intent) = (context!, intent!);
     final action = intent.getAction();
     switch (action) {
       case _ when action == jni.BluetoothAdapter.ACTION_STATE_CHANGED:
-        final btState = intent.getIntExtra(
-            jni.BluetoothAdapter.EXTRA_STATE, -1);
+        final btState =
+            intent.getIntExtra(jni.BluetoothAdapter.EXTRA_STATE, -1);
         switch (btState) {
           case jni.BluetoothAdapter.STATE_ON:
             _isEnabledCtrl.add(true);
@@ -100,8 +101,8 @@ class TheLastBluetooth {
         break;
       case _ when action == jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED:
         final extraDev = _getExtraDev(intent);
-        final bondState = intent.getIntExtra(
-            jni.BluetoothDevice.EXTRA_BOND_STATE, -1);
+        final bondState =
+            intent.getIntExtra(jni.BluetoothDevice.EXTRA_BOND_STATE, -1);
         switch (bondState) {
           case jni.BluetoothDevice.BOND_BONDED:
             _pairedDevicesCtrl.add(
@@ -142,9 +143,8 @@ class TheLastBluetooth {
         break;
       case _ when action == jni.BluetoothDevice.ACTION_NAME_CHANGED:
         final extraDev = _getExtraDev(intent);
-        final name = intent
-            .getStringExtra(jni.BluetoothDevice.EXTRA_NAME)
-            .toDString();
+        final name =
+            intent.getStringExtra(jni.BluetoothDevice.EXTRA_NAME)!.toDString();
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.nameCtrl
@@ -155,7 +155,7 @@ class TheLastBluetooth {
         _pairedDevicesCtrl.value
             .firstWhereOrNull((dev) => dev.mac == extraDev.mac)
             ?.aliasCtrl
-            .add(extraDev.dev.getAlias().toDString());
+            .add(extraDev.dev.getAlias()!.toDString());
         break;
       case _ when action == _ACTION_BATTERY_LEVEL_CHANGED:
         final extraDev = _getExtraDev(intent);
@@ -173,25 +173,25 @@ class TheLastBluetooth {
   ({String mac, jni.BluetoothDevice dev}) _getExtraDev(jni.Intent intent) {
     final extraDev = intent.getParcelableExtra(
       jni.BluetoothDevice.EXTRA_DEVICE,
-      T: const jni.$BluetoothDeviceType(),
+      T: jni.BluetoothDevice.type,
     );
-    return (mac: extraDev.getAddress().toDString(), dev: extraDev);
+    return (mac: extraDev!.getAddress()!.toDString(), dev: extraDev);
   }
 
   _BluetoothDevice _androidDevToDart(jni.BluetoothDevice dev) {
     final uuids = dev.getUuids();
     final battery = jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
     return _BluetoothDevice(
-      dev.getAddress().toDString(),
-      nameCtrl: BehaviorSubject.seeded(dev.getName().toDString()),
-      aliasCtrl: BehaviorSubject.seeded(dev.getAlias().toDString()),
+      dev.getAddress()!.toDString(),
+      nameCtrl: BehaviorSubject.seeded(dev.getName()!.toDString()),
+      aliasCtrl: BehaviorSubject.seeded(dev.getAlias()!.toDString()),
       isConnectedCtrl: BehaviorSubject.seeded(
           jni.TheLastUtils.isBluetoothDeviceConnected(dev)),
       uuidsCompleter: Completer()
         ..complete(
           Iterable.generate(
-            uuids.length,
-            (i) => uuids[i].toString(),
+            uuids?.length ?? 0,
+            (i) => uuids![i].toString(),
           ).toSet(),
         ),
       batteryLevelCtrl:
@@ -225,20 +225,20 @@ class TheLastBluetooth {
     final toDevice = StreamController<Uint8List>();
     final fromDevice = StreamController<Uint8List>.broadcast();
     StreamSubscription? fromDeviceLoopSub;
-    final jniDev = _adapter.getRemoteDevice(ourDev!.mac.toJString());
+    final jniDev = _adapter.getRemoteDevice(ourDev!.mac.toJString())!;
     final socket = jniDev.createRfcommSocketToServiceRecord(
       jni.UUID.fromString(serviceUuid.toJString()),
-    );
+    )!;
     if (socket.isConnected()) {
       if (force) {
-        socket.finalize();
+        socket.close();
       } else {
         throw "Device is already connected";
       }
     }
     socket.connect();
-    final jniToDevice = socket.getOutputStream();
-    final jniFromDevice = socket.getInputStream();
+    final jniToDevice = socket.getOutputStream()!;
+    final jniFromDevice = socket.getInputStream()!;
 
     closeEverything() {
       toDevice.close();
@@ -248,11 +248,11 @@ class TheLastBluetooth {
     }
 
     toDevice.stream.listen((received) {
-      final buffer = JArray(const jbyteType(), received.length);
+      final buffer = JByteArray(received.length);
       received.forEachIndexed((i, e) => buffer[i] = e);
       try {
         // maybe: make new isolate for this some day
-        jniToDevice.write1(buffer);
+        jniToDevice.write$1(buffer);
       } catch (_) {
         closeEverything();
       }
@@ -269,9 +269,9 @@ class TheLastBluetooth {
         if (!socket.isConnected()) return false;
         final available = jniFromDevice.available();
         if (available > 0) {
-          final buffer = JArray(const jbyteType(), 1024);
+          final buffer = JByteArray(1024);
           try {
-            final read = jniFromDevice.read1(buffer);
+            final read = jniFromDevice.read$1(buffer);
             if (read < 0) return false;
             fromDevice.add(
               Uint8List.fromList(

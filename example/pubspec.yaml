@@ -32,15 +32,15 @@ dependencies:
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
     path: ../
-  permission_handler: ^11.3.0
+  permission_handler: ^11.3.1
   bluetooth_identifiers: ^1.1.1
-  collection: ^1.18.0
+  collection: ^1.19.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
