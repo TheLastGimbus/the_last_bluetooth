@@ -16,9 +16,9 @@ import 'src/utils.dart';
 export 'src/bluetooth_device.dart';
 
 class TheLastBluetooth {
-  static final TheLastBluetooth _instance = TheLastBluetooth._();
+  TheLastBluetooth._();
 
-  static TheLastBluetooth get instance => _instance;
+  static final TheLastBluetooth _instance = TheLastBluetooth._();
 
   late jni.BluetoothManager _manager;
   late jni.BluetoothAdapter _adapter;
@@ -27,61 +27,7 @@ class TheLastBluetooth {
   final _isEnabledCtrl = BehaviorSubject<bool>();
   final _pairedDevicesCtrl = BehaviorSubject<Set<CtrlBluetoothDevice>>();
 
-  TheLastBluetooth._();
-
-  void init() {
-    // TODO: maybe don't require permission to init plugin but gradually, huh??
-    // TODO: DEVICES OFTEN "BLINK" ABOUT THEIR CONNECTION
-
-    // this is some init stuff - maybe move this to manual init() dispose() ?
-    final ctx = jni.Context.fromReference(Jni.getCachedApplicationContext());
-
-    _manager = ctx
-        .getSystemService(jni.Context.BLUETOOTH_SERVICE)!
-        .as(jni.BluetoothManager.type);
-    _adapter = _manager.getAdapter()!;
-
-    // emit devices when enabled, clear when disabled
-    _isEnabledCtrl.listen((event) {
-      if (event) {
-        _pairedDevicesCtrl.add(
-          _adapter
-              .getBondedDevices()!
-              .map(
-                (dev) => CtrlBluetoothDevice.fromAndroidBluetoothDevice(dev!),
-              )
-              .toSet(),
-        );
-      } else {
-        _pairedDevicesCtrl.valueOrNull?.forEach((dev) => dev.close());
-        _pairedDevicesCtrl.add(<CtrlBluetoothDevice>{});
-      }
-    });
-    // this will also nicely trigger listener above :)
-    _isEnabledCtrl.add(_adapter.isEnabled());
-
-    // Register receiver:
-    final tlr = jni.TheLastBroadcastReceiver(
-      jni.BroadcastReceiverInterface.implement(
-        jni.$BroadcastReceiverInterface(onReceive: onReceive),
-      ),
-    );
-    final filter = jni.IntentFilter();
-    for (final action in [
-      jni.BluetoothAdapter.ACTION_STATE_CHANGED,
-      jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED,
-      jni.BluetoothDevice.ACTION_ACL_CONNECTED,
-      jni.BluetoothDevice.ACTION_ACL_DISCONNECTED,
-      jni.BluetoothDevice.ACTION_NAME_CHANGED,
-      jni.BluetoothDevice.ACTION_ALIAS_CHANGED,
-      enums.BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED.toJString(),
-    ]) {
-      filter.addAction(action);
-    }
-    ctx.registerReceiver(tlr, filter);
-  }
-
-  void onReceive(jni.Context? context, jni.Intent? intent) {
+  void _handleBroadcast(jni.Context? context, jni.Intent? intent) {
     (context, intent) = (context!, intent!);
 
     /// Shitty helper function for less writing
@@ -152,6 +98,60 @@ class TheLastBluetooth {
           getPairedDevice(dev.mac)?.batteryLevelCtrl.addDistinct(battery);
         }
     }
+  }
+
+  static TheLastBluetooth get instance => _instance;
+
+  void init() {
+    // TODO: maybe don't require permission to init plugin but gradually, huh??
+    // TODO: DEVICES OFTEN "BLINK" ABOUT THEIR CONNECTION
+
+    // this is some init stuff - maybe move this to manual init() dispose() ?
+    final ctx = jni.Context.fromReference(Jni.getCachedApplicationContext());
+
+    _manager = ctx
+        .getSystemService(jni.Context.BLUETOOTH_SERVICE)!
+        .as(jni.BluetoothManager.type);
+    _adapter = _manager.getAdapter()!;
+
+    // emit devices when enabled, clear when disabled
+    _isEnabledCtrl.listen((event) {
+      if (event) {
+        _pairedDevicesCtrl.add(
+          _adapter
+              .getBondedDevices()!
+              .map(
+                (dev) => CtrlBluetoothDevice.fromAndroidBluetoothDevice(dev!),
+              )
+              .toSet(),
+        );
+      } else {
+        _pairedDevicesCtrl.valueOrNull?.forEach((dev) => dev.close());
+        _pairedDevicesCtrl.add(<CtrlBluetoothDevice>{});
+      }
+    });
+    // this will also nicely trigger listener above :)
+    _isEnabledCtrl.add(_adapter.isEnabled());
+
+    // Register receiver:
+    final tlr = jni.TheLastBroadcastReceiver(
+      jni.BroadcastReceiverInterface.implement(
+        jni.$BroadcastReceiverInterface(onReceive: _handleBroadcast),
+      ),
+    );
+    final filter = jni.IntentFilter();
+    for (final action in [
+      jni.BluetoothAdapter.ACTION_STATE_CHANGED,
+      jni.BluetoothDevice.ACTION_BOND_STATE_CHANGED,
+      jni.BluetoothDevice.ACTION_ACL_CONNECTED,
+      jni.BluetoothDevice.ACTION_ACL_DISCONNECTED,
+      jni.BluetoothDevice.ACTION_NAME_CHANGED,
+      jni.BluetoothDevice.ACTION_ALIAS_CHANGED,
+      enums.BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED.toJString(),
+    ]) {
+      filter.addAction(action);
+    }
+    ctx.registerReceiver(tlr, filter);
   }
 
   // ###### IMPORTANT NOTES ######
