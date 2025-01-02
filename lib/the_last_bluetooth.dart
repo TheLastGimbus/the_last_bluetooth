@@ -9,6 +9,8 @@ import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/src/android_bluetooth.g.dart' as jni;
 
 import 'src/bluetooth_device.dart';
+import 'src/ctrl_bluetooth_device.dart';
+import 'src/utils.dart';
 
 export 'src/bluetooth_device.dart';
 
@@ -29,7 +31,7 @@ class TheLastBluetooth {
 
   // Our streams for user:
   final _isEnabledCtrl = BehaviorSubject<bool>();
-  final _pairedDevicesCtrl = BehaviorSubject<Set<_BluetoothDevice>>();
+  final _pairedDevicesCtrl = BehaviorSubject<Set<CtrlBluetoothDevice>>();
 
   TheLastBluetooth._();
 
@@ -56,7 +58,7 @@ class TheLastBluetooth {
         );
       } else {
         _pairedDevicesCtrl.valueOrNull?.forEach((dev) => dev.close());
-        _pairedDevicesCtrl.add(<_BluetoothDevice>{});
+        _pairedDevicesCtrl.add(<CtrlBluetoothDevice>{});
       }
     });
     // this will also nicely trigger listener above :)
@@ -178,10 +180,10 @@ class TheLastBluetooth {
     return (mac: extraDev!.getAddress()!.toDString(), dev: extraDev);
   }
 
-  _BluetoothDevice _androidDevToDart(jni.BluetoothDevice dev) {
+  CtrlBluetoothDevice _androidDevToDart(jni.BluetoothDevice dev) {
     final uuids = dev.getUuids();
     final battery = jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
-    return _BluetoothDevice(
+    return CtrlBluetoothDevice(
       dev.getAddress()!.toDString(),
       nameCtrl: BehaviorSubject.seeded(dev.getName()!.toDString()),
       aliasCtrl: BehaviorSubject.seeded(dev.getAlias()!.toDString()),
@@ -309,80 +311,4 @@ class TheLastBluetooth {
 
   ValueStream<Set<BluetoothDevice>> get pairedDevices =>
       _pairedDevicesCtrl.stream;
-}
-
-class _BluetoothDevice implements BluetoothDevice {
-  const _BluetoothDevice(
-    this.mac, {
-    required this.nameCtrl,
-    required this.aliasCtrl,
-    required this.isConnectedCtrl,
-    required this.uuidsCompleter,
-    required this.batteryLevelCtrl,
-  });
-
-  /// Devices that randomize their MACs are currently out of scope of this
-  /// library, and I just know too few about this. This will be a breaking
-  /// change if it ever comes up
-  @override
-  final String mac;
-
-  final BehaviorSubject<String> nameCtrl;
-  final BehaviorSubject<String> aliasCtrl;
-  final BehaviorSubject<bool> isConnectedCtrl;
-  final Completer<Set<String>> uuidsCompleter;
-  final BehaviorSubject<int> batteryLevelCtrl;
-
-  void close() {
-    nameCtrl.close();
-    aliasCtrl.close();
-    isConnectedCtrl.close();
-    if (!uuidsCompleter.isCompleted) {
-      uuidsCompleter.complete(<String>{});
-    }
-    batteryLevelCtrl.close();
-  }
-
-  @override
-  ValueStream<String> get name => nameCtrl.stream;
-
-  @override
-  ValueStream<String> get alias => aliasCtrl.stream;
-
-  // I have a problem with this
-  // I'm not sure if I should abstract "stuff that doesn't work when not
-  // connected" away to some sub-class, or leave it just not emitting/responding
-  @override
-  ValueStream<bool> get isConnected => isConnectedCtrl.stream;
-
-  @override
-  Future<Set<String>> get uuids => uuidsCompleter.future;
-
-  @override
-  ValueStream<int> get battery => batteryLevelCtrl.stream;
-}
-
-extension on JString {
-  /// just with [releaseOriginal] true by default
-  String toDString({bool releaseOriginal = true}) =>
-      toDartString(releaseOriginal: releaseOriginal);
-}
-
-extension TheLastSubject<T> on BehaviorSubject<T> {
-  void addDistinct(T value) {
-    if (valueOrNull != value) {
-      add(value);
-    }
-  }
-}
-
-/// stream that does computation() as long as it's listened and computation()
-/// returns true
-/// when it's .close()d, or returns false, it stops
-Stream<bool> loopStream(FutureOr<bool> Function() computation) async* {
-  while (true) {
-    final status = await computation();
-    yield status;
-    if (!status) break;
-  }
 }
