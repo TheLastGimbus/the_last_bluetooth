@@ -35,6 +35,9 @@ class TheLastBluetooth {
         _pairedDevicesCtrl.value.firstWhereOrNull((dev) => dev.mac == mac);
 
     final action = intent.getAction()!.toDString();
+    // maybetodo: replace this some day with special enum that we would also
+    // feed function that registers watching for this, and then Dart would check
+    // if this switch is exhaustive
     switch (action) {
       case enums.BluetoothAdapter.ACTION_STATE_CHANGED:
         _isEnabledCtrl.addDistinct(
@@ -97,6 +100,21 @@ class TheLastBluetooth {
         if (battery >= 0) {
           getPairedDevice(dev.mac)?.batteryLevelCtrl.addDistinct(battery);
         }
+        break;
+      case enums.BluetoothDevice.ACTION_UUID:
+        final dev = getDeviceExtra(intent);
+        // i thought about some error logging here etc, but you know, fuck it.
+        // if at this point this dev would be null then this is very fucked
+        // and hell yeah a good NullPointer will be good motivation to fix this
+        final localDev = getPairedDevice(dev.mac)!;
+        if (!localDev.uuidsCompleter.isCompleted) {
+          final uuids = dev.dev
+              .getUuids()
+              ?.map((e) => e.toString().toLowerCase())
+              .toSet();
+          if (uuids != null) localDev.uuidsCompleter.complete(uuids);
+        }
+        break;
     }
   }
 
@@ -148,6 +166,7 @@ class TheLastBluetooth {
       jni.BluetoothDevice.ACTION_NAME_CHANGED,
       jni.BluetoothDevice.ACTION_ALIAS_CHANGED,
       enums.BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED.toJString(),
+      jni.BluetoothDevice.ACTION_UUID,
     ]) {
       filter.addAction(action);
     }
