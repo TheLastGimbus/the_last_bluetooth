@@ -58,13 +58,17 @@ class CtrlBluetoothDevice implements BluetoothDevice {
 
   static CtrlBluetoothDevice fromAndroidBluetoothDevice(
       jni.BluetoothDevice dev) {
-    final battery = jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev);
-    final uuids =
-        dev.getUuids()?.map((e) => e.toString().toLowerCase()).toSet();
+    final (name, alias, uuids, battery) = (
+      dev.getName()?.toDString(),
+      dev.getAlias()?.toDString(),
+      dev.getUuids()?.map((e) => e.toString().toLowerCase()).toSet(),
+      jni.TheLastUtils.bluetoothDeviceBatteryLevel(dev)
+    );
     return CtrlBluetoothDevice(
       dev.getAddress()!.toDString(),
-      nameCtrl: BehaviorSubject.seeded(dev.getName()!.toDString()),
-      aliasCtrl: BehaviorSubject.seeded(dev.getAlias()!.toDString()),
+      nameCtrl: name != null ? BehaviorSubject.seeded(name) : BehaviorSubject(),
+      aliasCtrl:
+          alias != null ? BehaviorSubject.seeded(alias) : BehaviorSubject(),
       isConnectedCtrl: BehaviorSubject.seeded(
           jni.TheLastUtils.isBluetoothDeviceConnected(dev)),
       uuidsCompleter:
