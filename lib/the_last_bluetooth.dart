@@ -171,6 +171,9 @@ class TheLastBluetooth {
       filter.addAction(action);
     }
     ctx.registerReceiver(tlr, filter);
+    // maybe this will help 🤷🤷🤷
+    ctx.release();
+    // https://media.istockphoto.com/id/91520053/photo/senior-man-shrugging-shoulders.jpg?s=612x612&w=0&k=20&c=x9iR8Az32VZwE0VOlu9s30Urp8HunhuwfBN2RmFCytg=
   }
 
   // ###### IMPORTANT NOTES ######
@@ -195,11 +198,22 @@ class TheLastBluetooth {
       {bool force = false}) {
     final ourDev =
         _pairedDevicesCtrl.value.firstWhereOrNull((d) => d.mac == device.mac);
-    assert(ourDev?.isConnected.valueOrNull ?? false);
+    if (!(ourDev?.isConnected.valueOrNull ?? false)) {
+      throw "Trying to connectRfcomm() to disconnected dev";
+    }
     final toDevice = StreamController<Uint8List>();
     final fromDevice = StreamController<Uint8List>.broadcast();
     StreamSubscription? fromDeviceLoopSub;
-    final jniDev = _adapter.getRemoteDevice(ourDev!.mac.toJString())!;
+    // Android documentation says
+    // "A BluetoothDevice will always be returned for a valid hardware address,
+    // even if this adapter has never seen that device."
+    // But i don't trust it - check for null for sure
+    final jniDev = _adapter.getRemoteDevice(ourDev!.mac.toJString());
+    // IS CONNECTED FOR SURE
+    if (jniDev == null || !jni.TheLastUtils.isBluetoothDeviceConnected(jniDev)) {
+      ourDev.isConnectedCtrl.add(false);
+      throw "Trying to connectRfcomm() to disconnected dev";
+    }
     final socket = jniDev.createRfcommSocketToServiceRecord(
       jni.UUID.fromString(serviceUuid.toJString()),
     )!;
