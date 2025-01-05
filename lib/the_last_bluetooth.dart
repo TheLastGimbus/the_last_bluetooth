@@ -129,7 +129,7 @@ class TheLastBluetooth {
 
     _manager = ctx
         .getSystemService(jni.Context.BLUETOOTH_SERVICE)!
-        .as(jni.BluetoothManager.type);
+        .as(jni.BluetoothManager.type, releaseOriginal: true);
     _adapter = _manager.getAdapter()!;
 
     // emit devices when enabled, clear when disabled
